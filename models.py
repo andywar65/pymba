@@ -268,7 +268,7 @@ class PymbaPage(Page):
         outstr += f'rotation="{temp["210"]} {temp["50"]} {temp["220"]}">\n'
         outstr += f'<a-box id="box-{x}" \n'
         outstr += f'position="{float(temp["41"])/2} {float(temp["43"])/2} {-float(temp["42"])/2}" \n'
-        outstr += f'scale="{temp["41"]} {temp["43"]} {temp["42"]}" \n'
+        outstr += f'scale="{fabs(float(temp["41"]))} {fabs(float(temp["43"]))} {fabs(float(temp["42"]))}" \n'
         outstr += 'geometry="'
         try:
             if temp['segments-depth']!='1':
@@ -521,7 +521,7 @@ class PymbaPage(Page):
         outstr += f'rotation="{temp["210"]} {temp["50"]} {temp["220"]}">\n'
         outstr += f'<a-box id="wall-{x}" \n'
         outstr += f'position="{float(temp["41"])/2} {float(temp["43"])/2} {-float(temp["42"])/2}" \n'
-        outstr += f'scale="{temp["41"]} {temp["43"]} {temp["42"]}" \n'
+        outstr += f'scale="{fabs(float(temp["41"]))} {fabs(float(temp["43"]))} {fabs(float(temp["42"]))}" \n'
         outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
         outstr += self.is_repeat(temp["repeat"], temp["41"], temp["43"])
         outstr += '">\n</a-box>\n</a-entity>\n'
