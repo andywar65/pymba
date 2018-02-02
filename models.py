@@ -238,6 +238,9 @@ class PymbaPage(Page):
                     elif temp['2'] == 'a-link':
                         output[x] = self.make_link(x, temp)
 
+                    elif temp['2'] == 'a-wall':
+                        output[x] = self.make_wall(x, temp)
+
                     flag = False
 
                 if value == '3DFACE':#start 3D face
@@ -510,6 +513,18 @@ class PymbaPage(Page):
             if self.shadows:
                 outstr += 'castShadow: true;'
             outstr += '">\n</a-entity>\n'#close light entity
+        return outstr
+
+    def make_wall(self, x, temp):
+        outstr = f'<a-entity id="wall-ent-{x}" \n'
+        outstr += f'position="{temp["10"]} {temp["30"]} {temp["20"]}" \n'
+        outstr += f'rotation="{temp["210"]} {temp["50"]} {temp["220"]}">\n'
+        outstr += f'<a-box id="wall-{x}" \n'
+        outstr += f'position="{float(temp["41"])/2} {float(temp["43"])/2} {-float(temp["42"])/2}" \n'
+        outstr += f'scale="{temp["41"]} {temp["43"]} {temp["42"]}" \n'
+        outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
+        outstr += self.is_repeat(temp["repeat"], temp["41"], temp["43"])
+        outstr += '">\n</a-box>\n</a-entity>\n'
         return outstr
 
 class PymbaPageMaterialImage(Orderable):
