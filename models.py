@@ -257,7 +257,7 @@ class PymbaPage(Page):
 
     def is_repeat(self, repeat, rx, ry):
         if repeat:
-            output = f'; repeat:{rx} {ry}'
+            output = f'; repeat:{fabs(float(rx))} {fabs(float(ry))}'
             return output
         else:
             return ';'
@@ -291,7 +291,9 @@ class PymbaPage(Page):
         outstr += f'rotation="{temp["210"]} {temp["50"]} {temp["220"]}">\n'
         outstr += f'<a-cone id="cone-{x}" \n'
         outstr += f'position="0 {float(temp["43"])/2} 0" \n'
-        outstr += f'scale="{temp["41"]} {temp["43"]} {temp["42"]}" \n'
+        if float(temp['43']) < 0:
+            outstr += 'rotation="180 0 0">\n'
+        outstr += f'scale="{fabs(float(temp["41"]))} {fabs(float(temp["43"]))} {fabs(float(temp["42"]))}" \n'
         outstr += 'geometry="'
         try:
             if temp['open-ended']!='false':
@@ -321,7 +323,7 @@ class PymbaPage(Page):
         outstr += f'<a-circle id="circle-{x}" \n'
         if temp['2'] == 'circle':
             outstr += f'rotation="-90 0 0"\n'
-        outstr += f'radius="{temp["41"]}" \n'
+        outstr += f'radius="{fabs(float(temp["41"]))}" \n'
         outstr += 'geometry="'
         try:
             if temp['segments']!='32':
@@ -344,7 +346,9 @@ class PymbaPage(Page):
         outstr += f'rotation="{temp["210"]} {temp["50"]} {temp["220"]}">\n'
         outstr += f'<a-cylinder id="cylinder-{x}" \n'
         outstr += f'position="0 {float(temp["43"])/2} 0" \n'
-        outstr += f'scale="{temp["41"]} {temp["43"]} {temp["42"]}" \n'
+        if float(temp['43']) < 0:
+            outstr += 'rotation="180 0 0">\n'
+        outstr += f'scale="{fabs(float(temp["41"]))} {fabs(float(temp["43"]))} {fabs(float(temp["42"]))}" \n'
         outstr += 'geometry="'
         try:
             if temp['open-ended']!='false':
@@ -373,7 +377,9 @@ class PymbaPage(Page):
         outstr += f'rotation="{temp["210"]} {temp["50"]} {temp["220"]}">\n'
         outstr += f'<a-sphere id="sphere-{x}" \n'
         outstr += f'position="0 {temp["43"]} 0" \n'
-        outstr += f'scale="{temp["41"]} {temp["43"]} {temp["42"]}" \n'
+        if float(temp['43']) < 0:
+            outstr += 'rotation="180 0 0">\n'
+        outstr += f'scale="{fabs(float(temp["41"]))} {fabs(float(temp["43"]))} {fabs(float(temp["42"]))}" \n'
         outstr += 'geometry="'
         try:
             if temp['phi-length']!='360':
@@ -408,7 +414,7 @@ class PymbaPage(Page):
             outstr += f'position="{float(temp["41"])/2} {-float(temp["43"])/2} 0" \n'
         else:#insertion is at corner
             outstr += f'position="{float(temp["41"])/2} {float(temp["43"])/2} 0" \n'
-        outstr += f'width="{temp["41"]}" height="{temp["43"]}" \n'
+        outstr += f'width="{fabs(float(temp["41"]))}" height="{fabs(float(temp["43"]))}" \n'
         outstr += 'geometry="'
         try:
             if temp['segments-height']!='1':
