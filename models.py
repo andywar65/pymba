@@ -13,6 +13,46 @@ from wagtail.wagtailsearch import index
 from wagtail.wagtaildocs.models import Document
 from wagtail.wagtaildocs.edit_handlers import DocumentChooserPanel
 
+class PymbaWallPage(Page):
+    intro = models.CharField(max_length=250, null=True, blank=True,)
+    image = models.ForeignKey(
+        'wagtailimages.Image', 
+        null=True,
+        blank=True,
+        on_delete = models.SET_NULL, 
+        related_name = '+',
+        )
+    pattern = models.BooleanField(default=False)
+    color = models.CharField(max_length=250, default="white",)
+
+    search_fields = Page.search_fields + [
+        index.SearchField('intro'),
+    ]
+
+    content_panels = Page.content_panels + [
+        FieldPanel('intro'),
+        MultiFieldPanel([
+            ImageChooserPanel('image'),
+            FieldPanel('pattern'),
+            FieldPanel('color'),
+        ], heading="Appearance"),
+        InlinePanel('wall_layers', label="Wall layers",),
+    ]
+
+class PymbaWallPageLayers(Orderable):
+    page = ParentalKey(PymbaWallPage, related_name='wall_layers')
+    material = models.CharField(max_length=250, default="brick",)
+    thickness = models.CharField(max_length=250, default="0",)
+    weight = models.CharField(max_length=250, default="0",)
+
+    panels = [
+        FieldPanel('material'),
+        MultiFieldPanel([
+            FieldPanel('thickness'),
+            FieldPanel('weight'),
+        ], heading="Features"),
+    ]
+
 class PymbaPage(Page):
     intro = models.CharField(max_length=250, null=True, blank=True,)
     equirectangular_image = models.ForeignKey(
@@ -34,7 +74,6 @@ class PymbaPage(Page):
 
     search_fields = Page.search_fields + [
         index.SearchField('intro'),
-        #index.SearchField('body'),
     ]
 
     content_panels = Page.content_panels + [
@@ -551,4 +590,4 @@ class PymbaPageMaterialImage(Orderable):
         ImageChooserPanel('image'),
         FieldPanel('pattern'),
         FieldPanel('color'),
-]
+    ]
