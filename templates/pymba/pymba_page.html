@@ -22,17 +22,23 @@
 			   <img id="sky" src="{% static 'images/target.png' %}">
 			 {% endif %}
 			{% endwith %}
-			{% with material_images=page.material_images.all %}
-			 {% if material_images %}
-			  {% for material in material_images %}
+
+			  {% for material in page.material_images.all %}
 			   {% if material.image %}
 			    {% image material.image original as temp_image %}
 			     <a-img id="image-{{ material.layer }}" 
 			     src="{{ temp_image.url }}">
 			   {% endif %}
 			  {% endfor %}
-			 {% endif %}
-			{% endwith %}
+
+			  {% for wall in page.get_wall_children %}
+			   {% if wall.specific.image %}
+			    {% image wall.specific.image original as temp_image %}
+			     <a-img id="wall-image-{{ wall }}" 
+			     src="{{ temp_image.url }}">
+			   {% endif %}
+			  {% endfor %}
+
 		</a-assets>
 		{% with shadows=page.shadows %}
 			<a-entity id="dxf-ent" shadow="receive: {{ shadows|lower }}; cast: {{ shadows|lower }}"

@@ -88,6 +88,11 @@ class PymbaPage(Page):
         InlinePanel('material_images', label="Material Image Gallery",),
     ]
 
+    def get_wall_children(self):
+        wall_children = self.get_children().type(PymbaWallPage).all()
+        return wall_children
+
+#it would be desirable to move all the next functions into a new file and have only models here
     def extract_dxf(self):
         path_to_dxf = os.path.join(settings.MEDIA_ROOT, 'documents', self.dxf_file.filename)
         dxf_f = open(path_to_dxf, encoding = 'utf-8')
