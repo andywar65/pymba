@@ -566,6 +566,18 @@ class PymbaPage(Page):
         return outstr
 
     def make_wall(self, x, temp):
+        if temp['type']:
+            try:
+                wall_type = PymbaWallPage.objects.get(title = temp['type'])#how can I restrict to children?
+                if wall_type.image:
+                    temp['8'] = 'wall-' + wall_type.title
+                if wall_type.color:
+                    temp['color'] = wall_type.color
+                temp['repeat']=False
+                if wall_type.pattern:# == True
+                    temp['repeat']=True
+            except:
+                pass
         outstr = f'<a-entity id="wall-ent-{x}" \n'
         outstr += f'position="{temp["10"]} {temp["30"]} {temp["20"]}" \n'
         outstr += f'rotation="{temp["210"]} {temp["50"]} {temp["220"]}">\n'

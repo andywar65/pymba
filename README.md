@@ -1,5 +1,6 @@
 # PYMba
-A [Django](https://www.djangoproject.com/) / [Wagtail](https://wagtail.io/) app that imports [DXF](https://en.wikipedia.org/wiki/AutoCAD_DXF) files and renders Virtual Reality using [A-Frame](https://aframe.io) library.
+
+A basic BIM as a [Django](https://www.djangoproject.com/) / [Wagtail](https://wagtail.io/) app that imports [CAD](https://en.wikipedia.org/wiki/AutoCAD_DXF) files and renders Virtual Reality using [A-Frame](https://aframe.io) library.
 
 ### What does PYMba mean?
 
@@ -52,7 +53,7 @@ enter the Inspector mode, that makes you inspect and modify the entities of the 
 
 BIM standard blocks are recognized as real life building elements. By now we have only the `Wall` BIM element. It behaves pretty much as a box, but attributes are different: wall `type` and inside, outside, right and left `finishing`.
 
-Wall types are defined in the backend as `PYMba Wall Pages`, and must be children of the `Pymba Page` they are related to. Creating a new wall type requires Title, Intro, Image (is it a pattern?) and Color. You can then add as many wall layers to the wall type as you want. Layers require a material, a thickness (in centimeters) and a weight in kilograms per square meter.
+Wall types are defined in the backend as `PYMba Wall Pages`, and must be children of the `Pymba Page` they are related to. Creating a new wall type requires Title, Intro, Image (is it a pattern?) and Color. You can then add as many wall layers to the wall type as you want. Layers require a material, a thickness (in centimeters) and a weight in kilograms per cubic meter.
 
 ### Next improvements
 

@@ -34,7 +34,7 @@
 			  {% for wall in page.get_wall_children %}
 			   {% if wall.specific.image %}
 			    {% image wall.specific.image original as temp_image %}
-			     <a-img id="wall-image-{{ wall }}" 
+			     <a-img id="image-wall-{{ wall }}" 
 			     src="{{ temp_image.url }}">
 			   {% endif %}
 			  {% endfor %}
