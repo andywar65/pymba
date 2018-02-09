@@ -581,15 +581,24 @@ class PymbaPage(Page):
         return outstr
 
     def make_wall(self, x, temp, wall_types):
+        temp['alert'] = 'None'
         if temp['type']:
             try:
                 wall_type = wall_types.get(title = temp['type'])
                 wall_thickness = 0
+                fixed_thickness = True
                 for wall_layer in wall_type.wall_layers.all():
+                    if float(wall_layer.thickness) == 0:
+                        fixed_thickness = False
                     wall_thickness += float(wall_layer.thickness)
-                if fabs(float(temp['42'])) < wall_thickness/100:
+                if fixed_thickness and fabs(float(temp['42'])) != wall_thickness/100:
                     temp['8'] = 'default'
                     temp['color'] = 'red'
+                    temp['alert'] = 'Different than Wall Type'
+                elif fabs(float(temp['42'])) < wall_thickness/100:
+                    temp['8'] = 'default'
+                    temp['color'] = 'red'
+                    temp['alert'] = 'Wall too thin'
                 else:
                     if wall_type.image:
                         temp['8'] = 'wall-' + wall_type.title
@@ -607,7 +616,7 @@ class PymbaPage(Page):
         outstr += f'scale="{fabs(float(temp["41"]))} {fabs(float(temp["43"]))} {fabs(float(temp["42"]))}" \n'
         outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
         outstr += self.is_repeat(temp["repeat"], temp["41"], temp["43"])
-        outstr += '">\n</a-box>\n</a-entity>\n'
+        outstr += f'">\n</a-box>\n Alert: {temp["alert"]}</a-entity>\n'
         return outstr
 
 class PymbaPageMaterialImage(Orderable):
