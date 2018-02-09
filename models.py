@@ -584,12 +584,19 @@ class PymbaPage(Page):
         if temp['type']:
             try:
                 wall_type = wall_types.get(title = temp['type'])
-                if wall_type.image:
-                    temp['8'] = 'wall-' + wall_type.title
-                temp['color'] = wall_type.color
-                temp['repeat']=False
-                if wall_type.pattern:# == True
-                    temp['repeat']=True
+                wall_thickness = 0
+                for wall_layer in wall_type.wall_layers.all():
+                    wall_thickness += float(wall_layer.thickness)
+                if fabs(float(temp['42'])) < wall_thickness/100:
+                    temp['8'] = 'default'
+                    temp['color'] = 'red'
+                else:
+                    if wall_type.image:
+                        temp['8'] = 'wall-' + wall_type.title
+                    temp['color'] = wall_type.color
+                    temp['repeat']=False
+                    if wall_type.pattern:# == True
+                        temp['repeat']=True
             except:
                 pass
         outstr = f'<a-entity id="wall-ent-{x}" \n'
