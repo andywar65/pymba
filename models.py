@@ -97,6 +97,7 @@ class PymbaPage(Page):
         path_to_dxf = os.path.join(settings.MEDIA_ROOT, 'documents', self.dxf_file.filename)
         dxf_f = open(path_to_dxf, encoding = 'utf-8')
         material_gallery=self.material_images.all()
+        wall_types = PymbaWallPage.objects#how can I restrict to children?TO DO
         output = {}
         flag = False
         x = 0
@@ -210,15 +211,21 @@ class PymbaPage(Page):
 
                 if flag == 'face':#close 3D face
                     #is material set in model?
-                    no_color=True
-                    if material_gallery:
-                        for material in material_gallery:
-                            if material.layer == temp['8']:
-                                no_color=False
-                                temp['color'] = material.color
-                    if no_color:#color is still not set for layer, so we use default
+                    try:
+                        material = material_gallery.get(layer = temp['8'])
+                        temp['color'] = material.color
+                    except:
                         temp['8'] = 'default'
                         temp['color'] = 'white'
+                    #no_color=True
+                    #if material_gallery:
+                        #for material in material_gallery:
+                            #if material.layer == temp['8']:
+                                #no_color=False
+                                #temp['color'] = material.color
+                    #if no_color:#color is still not set for layer, so we use default
+                        #temp['8'] = 'default'
+                        #temp['color'] = 'white'
 
                     output[x] = self.make_triangle_1(x, temp)
                     if temp['12']!=temp['13'] or temp['22']!=temp['23'] or temp['32']!=temp['33']:
@@ -232,17 +239,25 @@ class PymbaPage(Page):
 
                 elif flag == 'block':#close block
                     #material images are patterns? is material set in model?
-                    no_color=True
-                    if material_gallery:
-                        for material in material_gallery:
-                            if material.layer == temp['8']:
-                                no_color=False
-                                temp['color'] = material.color
-                                if material.pattern:# == True
-                                    temp['repeat']=True
-                    if no_color:#color is still not set for layer, so we use default
+                    try:
+                        material = material_gallery.get(layer = temp['8'])
+                        temp['color'] = material.color
+                        if material.pattern:# == True
+                            temp['repeat']=True
+                    except:
                         temp['8'] = 'default'
                         temp['color'] = 'white'
+                    #no_color=True
+                    #if material_gallery:
+                        #for material in material_gallery:
+                            #if material.layer == temp['8']:
+                                #no_color=False
+                                #temp['color'] = material.color
+                                #if material.pattern:# == True
+                                    #temp['repeat']=True
+                    #if no_color:#color is still not set for layer, so we use default
+                        #temp['8'] = 'default'
+                        #temp['color'] = 'white'
 
                     if temp['2'] == '6planes':#left for legacy
                         output[x] = self.make_box(x, temp)
@@ -283,7 +298,7 @@ class PymbaPage(Page):
                         output[x] = self.make_link(x, temp)
 
                     elif temp['2'] == 'a-wall':
-                        output[x] = self.make_wall(x, temp)
+                        output[x] = self.make_wall(x, temp, wall_types)
 
                     flag = False
 
@@ -565,14 +580,13 @@ class PymbaPage(Page):
             outstr += '">\n</a-entity>\n'#close light entity
         return outstr
 
-    def make_wall(self, x, temp):
+    def make_wall(self, x, temp, wall_types):
         if temp['type']:
             try:
-                wall_type = PymbaWallPage.objects.get(title = temp['type'])#how can I restrict to children?
+                wall_type = wall_types.get(title = temp['type'])
                 if wall_type.image:
                     temp['8'] = 'wall-' + wall_type.title
-                if wall_type.color:
-                    temp['color'] = wall_type.color
+                temp['color'] = wall_type.color
                 temp['repeat']=False
                 if wall_type.pattern:# == True
                     temp['repeat']=True
