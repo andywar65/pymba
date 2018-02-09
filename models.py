@@ -93,7 +93,9 @@ class PymbaPage(Page):
 #it would be desirable to move all the next functions into a new file and have only models here
     def extract_dxf(self):
         path_to_dxf = os.path.join(settings.MEDIA_ROOT, 'documents', self.dxf_file.filename)
+        path_to_csv = os.path.join(settings.MEDIA_ROOT, 'documents', self.slug + '.csv')
         dxf_f = open(path_to_dxf, encoding = 'utf-8')
+        csv_f = open(path_to_csv, 'w', encoding = 'utf-8',)
         material_gallery=self.material_images.all()
         wall_types = PymbaWallPage.objects#how can I restrict to children?TO DO
         output = {}
@@ -310,6 +312,7 @@ class PymbaPage(Page):
                     x += 1
 
         dxf_f.close()
+        csv_f.close()
         return output
 
     def is_repeat(self, repeat, rx, ry):
@@ -318,6 +321,10 @@ class PymbaPage(Page):
             return output
         else:
             return ';'
+
+    def get_csv_path(self):
+        path_to_csv = os.path.join(settings.MEDIA_URL, 'documents', self.slug + '.csv')
+        return path_to_csv
 
     def make_box(self, x, temp):
         outstr = f'<a-entity id="box-ent-{x}" \n'

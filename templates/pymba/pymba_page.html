@@ -64,4 +64,7 @@
                   </a-camera>
             </a-entity>
         </a-scene>
+			{% with csv_path=page.get_csv_path %}
+            <a id="" href="{{ csv_path }}">Download CSV file</a>
+			{% endwith %}
 {% endblock %}
