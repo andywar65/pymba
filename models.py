@@ -47,10 +47,8 @@ class PymbaWallPageLayers(Orderable):
 
     panels = [
         FieldPanel('material'),
-        MultiFieldPanel([
-            FieldPanel('thickness'),
-            FieldPanel('weight'),
-        ], heading="Features"),
+        FieldPanel('thickness'),
+        FieldPanel('weight'),
     ]
 
 class PymbaPage(Page):
@@ -591,7 +589,7 @@ class PymbaPage(Page):
                     if float(wall_layer.thickness) == 0:
                         fixed_thickness = False
                     wall_thickness += float(wall_layer.thickness)
-                if fixed_thickness and fabs(float(temp['42'])) != wall_thickness/100:
+                if wall_thickness and fixed_thickness and fabs(float(temp['42'])) != wall_thickness/100:
                     temp['8'] = 'default'
                     temp['color'] = 'red'
                     temp['alert'] = 'Different than Wall Type'
