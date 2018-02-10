@@ -96,6 +96,7 @@ class PymbaPage(Page):
         path_to_csv = os.path.join(settings.MEDIA_ROOT, 'documents', self.slug + '.csv')
         dxf_f = open(path_to_dxf, encoding = 'utf-8')
         csv_f = open(path_to_csv, 'w', encoding = 'utf-8',)
+        csv_f.write('Num,Block,Type,X,Y,Z,Rx,Ry,Rz,Width,Depth,Height,Alert \n')
         material_gallery=self.material_images.all()
         wall_types = PymbaWallPage.objects#how can I restrict to children?TO DO
         output = {}
@@ -217,15 +218,6 @@ class PymbaPage(Page):
                     except:
                         temp['8'] = 'default'
                         temp['color'] = 'white'
-                    #no_color=True
-                    #if material_gallery:
-                        #for material in material_gallery:
-                            #if material.layer == temp['8']:
-                                #no_color=False
-                                #temp['color'] = material.color
-                    #if no_color:#color is still not set for layer, so we use default
-                        #temp['8'] = 'default'
-                        #temp['color'] = 'white'
 
                     output[x] = self.make_triangle_1(x, temp)
                     if temp['12']!=temp['13'] or temp['22']!=temp['23'] or temp['32']!=temp['33']:
@@ -247,17 +239,6 @@ class PymbaPage(Page):
                     except:
                         temp['8'] = 'default'
                         temp['color'] = 'white'
-                    #no_color=True
-                    #if material_gallery:
-                        #for material in material_gallery:
-                            #if material.layer == temp['8']:
-                                #no_color=False
-                                #temp['color'] = material.color
-                                #if material.pattern:# == True
-                                    #temp['repeat']=True
-                    #if no_color:#color is still not set for layer, so we use default
-                        #temp['8'] = 'default'
-                        #temp['color'] = 'white'
 
                     if temp['2'] == '6planes':#left for legacy
                         output[x] = self.make_box(x, temp)
@@ -298,7 +279,7 @@ class PymbaPage(Page):
                         output[x] = self.make_link(x, temp)
 
                     elif temp['2'] == 'a-wall':
-                        output[x] = self.make_wall(x, temp, wall_types)
+                        output[x] = self.make_wall(x, temp, wall_types, csv_f)
 
                     flag = False
 
@@ -307,7 +288,7 @@ class PymbaPage(Page):
                     flag = 'face'
                     x += 1
                 elif value == 'INSERT':#start block
-                    temp = {'41': 1, '42': 1, '43': 1, '50': 0, '210': 0, '220': 0, '230': 1,'repeat': False}#default values
+                    temp = {'41': 1, '42': 1, '43': 1, '50': 0, '210': 0, '220': 0, '230': 1,'repeat': False, 'type': '',}#default values
                     flag = 'block'
                     x += 1
 
@@ -585,7 +566,7 @@ class PymbaPage(Page):
             outstr += '">\n</a-entity>\n'#close light entity
         return outstr
 
-    def make_wall(self, x, temp, wall_types):
+    def make_wall(self, x, temp, wall_types, csv_f):
         temp['alert'] = 'None'
         if temp['type']:
             try:
@@ -621,7 +602,9 @@ class PymbaPage(Page):
         outstr += f'scale="{fabs(float(temp["41"]))} {fabs(float(temp["43"]))} {fabs(float(temp["42"]))}" \n'
         outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
         outstr += self.is_repeat(temp["repeat"], temp["41"], temp["43"])
-        outstr += f'">\n</a-box>\n Alert: {temp["alert"]}</a-entity>\n'
+        outstr += f'">\n</a-box>\n </a-entity>\n'
+        csv_f.write(f'{x},{temp["2"]},{temp["type"]},{temp["10"]},{-float(temp["20"])},{temp["30"]},')
+        csv_f.write(f'{temp["210"]},{-float(temp["220"])},{temp["50"]},{temp["41"]},{temp["42"]},{temp["43"]},{temp["alert"]} \n')
         return outstr
 
 class PymbaPageMaterialImage(Orderable):

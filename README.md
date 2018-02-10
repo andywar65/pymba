@@ -54,6 +54,7 @@ enter the Inspector mode, that makes you inspect and modify the entities of the 
 BIM standard blocks are recognized as real life building elements. By now we have only the `Wall` BIM element. It behaves pretty much as a box, but attributes are different: wall `type` and inside, outside, right and left `finishing`.
 
 Wall types are defined in the backend as `PYMba Wall Pages`, and must be children of the `Pymba Page` they are related to. Creating a new wall type requires Title, Intro, Image (is it a pattern?) and Color. You can then add as many wall layers to the wall type as you want. Layers require a material, a thickness (in centimeters) and a weight in kilograms per cubic meter.
+The app controls if wall dimensions in CAD are consistent with Wall Type features, i.e. wall thickness. If inconsistency arises, wall is rendered in flat red. Wall data are stored in a CSV file downloadable from the frontend.
 
 ### Next improvements
 
