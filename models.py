@@ -96,7 +96,7 @@ class PymbaPage(Page):
         path_to_csv = os.path.join(settings.MEDIA_ROOT, 'documents', self.slug + '.csv')
         dxf_f = open(path_to_dxf, encoding = 'utf-8')
         csv_f = open(path_to_csv, 'w', encoding = 'utf-8',)
-        csv_f.write('Num,Block,Type,X,Y,Z,Rx,Ry,Rz,Width,Depth,Height,Alert \n')
+        csv_f.write('Num,Block,Type,X,Y,Z,Rx,Ry,Rz,Width,Depth,Height,Weight, Alert \n')
         material_gallery=self.material_images.all()
         wall_types = PymbaWallPage.objects#how can I restrict to children?TO DO
         output = {}
@@ -567,16 +567,23 @@ class PymbaPage(Page):
         return outstr
 
     def make_wall(self, x, temp, wall_types, csv_f):
-        temp['alert'] = 'None'
+        temp['alert'] = 'None'#outside the try or they could crash file write
+        wall_weight = 0
         if temp['type']:
             try:
                 wall_type = wall_types.get(title = temp['type'])
                 wall_thickness = 0
                 fixed_thickness = True
+                unit_weight = 0
+                zero_weight = 0
                 for wall_layer in wall_type.wall_layers.all():
                     if float(wall_layer.thickness) == 0:
                         fixed_thickness = False
+                        zero_weight = float(wall_layer.weight)
                     wall_thickness += float(wall_layer.thickness)
+                    unit_weight += float(wall_layer.thickness)/100 * float(wall_layer.weight)
+                unit_weight += (fabs(float(temp['42'])) - wall_thickness/100) * zero_weight#add eventual zero thickness layer
+                wall_weight = unit_weight * fabs(float(temp['41'])) * fabs(float(temp['43']))#actual wall size
                 if wall_thickness and fixed_thickness and fabs(float(temp['42'])) != wall_thickness/100:
                     temp['8'] = 'default'
                     temp['color'] = 'red'
@@ -604,7 +611,7 @@ class PymbaPage(Page):
         outstr += self.is_repeat(temp["repeat"], temp["41"], temp["43"])
         outstr += f'">\n</a-box>\n </a-entity>\n'
         csv_f.write(f'{x},{temp["2"]},{temp["type"]},{temp["10"]},{-float(temp["20"])},{temp["30"]},')
-        csv_f.write(f'{temp["210"]},{-float(temp["220"])},{temp["50"]},{temp["41"]},{temp["42"]},{temp["43"]},{temp["alert"]} \n')
+        csv_f.write(f'{temp["210"]},{-float(temp["220"])},{temp["50"]},{temp["41"]},{temp["42"]},{temp["43"]},{wall_weight},{temp["alert"]} \n')
         return outstr
 
 class PymbaPageMaterialImage(Orderable):
