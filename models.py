@@ -13,6 +13,63 @@ from wagtail.wagtailsearch import index
 from wagtail.wagtaildocs.models import Document
 from wagtail.wagtaildocs.edit_handlers import DocumentChooserPanel
 
+class PymbaFinishingPage(Page):
+    intro = models.CharField(max_length=250, null=True, blank=True,)
+    image = models.ForeignKey(
+        'wagtailimages.Image', 
+        null=True,
+        blank=True,
+        on_delete = models.SET_NULL, 
+        related_name = '+',
+        )
+    pattern = models.BooleanField(default=False)
+    color = models.CharField(max_length=250, default="white",)
+    tiling_height = models.CharField(max_length=250, default="0",)
+    tiling_image = models.ForeignKey(
+        'wagtailimages.Image', 
+        null=True,
+        blank=True,
+        on_delete = models.SET_NULL, 
+        related_name = '+',
+        )
+    tiling_pattern = models.BooleanField(default=False)
+    tiling_color = models.CharField(max_length=250, default="white",)
+    skirting_height = models.CharField(max_length=250, default="0",)
+    skirting_image = models.ForeignKey(
+        'wagtailimages.Image', 
+        null=True,
+        blank=True,
+        on_delete = models.SET_NULL, 
+        related_name = '+',
+        )
+    skirting_pattern = models.BooleanField(default=False)
+    skirting_color = models.CharField(max_length=250, default="white",)
+
+    search_fields = Page.search_fields + [
+        index.SearchField('intro'),
+    ]
+
+    content_panels = Page.content_panels + [
+        FieldPanel('intro'),
+        MultiFieldPanel([
+            ImageChooserPanel('image'),
+            FieldPanel('pattern'),
+            FieldPanel('color'),
+        ], heading="Appearance"),
+        MultiFieldPanel([
+            FieldPanel('tiling_height'),
+            ImageChooserPanel('tiling_image'),
+            FieldPanel('tiling_pattern'),
+            FieldPanel('tiling_color'),
+        ], heading="Tiling"),
+        MultiFieldPanel([
+            FieldPanel('skirting_height'),
+            ImageChooserPanel('skirting_image'),
+            FieldPanel('skirting_pattern'),
+            FieldPanel('skirting_color'),
+        ], heading="Skirting"),
+    ]
+
 class PymbaWallPage(Page):
     intro = models.CharField(max_length=250, null=True, blank=True,)
     image = models.ForeignKey(
