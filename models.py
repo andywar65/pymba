@@ -156,6 +156,7 @@ class PymbaPage(Page):
         csv_f.write('Num,Block,Type,X,Y,Z,Rx,Ry,Rz,Width,Depth,Height,Weight, Alert \n')
         material_gallery=self.material_images.all()
         wall_types = PymbaWallPage.objects#how can I restrict to children?TO DO
+        wall_finishings = PymbaFinishingPage.objects#how can I restrict to children?TO DO
         output = {}
         flag = False
         x = 0
@@ -336,7 +337,7 @@ class PymbaPage(Page):
                         output[x] = self.make_link(x, temp)
 
                     elif temp['2'] == 'a-wall':
-                        output[x] = self.make_wall(x, temp, wall_types, csv_f)
+                        output[x] = self.make_wall(x, temp, wall_types, wall_finishings, csv_f)
 
                     flag = False
 
@@ -623,7 +624,7 @@ class PymbaPage(Page):
             outstr += '">\n</a-entity>\n'#close light entity
         return outstr
 
-    def make_wall(self, x, temp, wall_types, csv_f):
+    def make_wall(self, x, temp, wall_types, wall_finishings, csv_f):
         temp['alert'] = 'None'#outside the try or they could crash file write
         wall_weight = 0
         if temp['type']:
@@ -642,12 +643,8 @@ class PymbaPage(Page):
                 unit_weight += (fabs(float(temp['42'])) - wall_thickness/100) * zero_weight#add eventual zero thickness layer
                 wall_weight = unit_weight * fabs(float(temp['41'])) * fabs(float(temp['43']))#actual wall size
                 if wall_thickness and fixed_thickness and fabs(float(temp['42'])) != wall_thickness/100:
-                    temp['8'] = 'default'
-                    temp['color'] = 'red'
                     temp['alert'] = 'Different than Wall Type'
                 elif fabs(float(temp['42'])) < wall_thickness/100:
-                    temp['8'] = 'default'
-                    temp['color'] = 'red'
                     temp['alert'] = 'Wall too thin'
                 else:
                     if wall_type.image:
@@ -661,12 +658,70 @@ class PymbaPage(Page):
         outstr = f'<a-entity id="wall-ent-{x}" \n'
         outstr += f'position="{temp["10"]} {temp["30"]} {temp["20"]}" \n'
         outstr += f'rotation="{temp["210"]} {temp["50"]} {temp["220"]}">\n'
-        outstr += f'<a-box id="wall-{x}" \n'
-        outstr += f'position="{float(temp["41"])/2} {float(temp["43"])/2} {-float(temp["42"])/2}" \n'
-        outstr += f'scale="{fabs(float(temp["41"]))} {fabs(float(temp["43"]))} {fabs(float(temp["42"]))}" \n'
-        outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
-        outstr += self.is_repeat(temp["repeat"], temp["41"], temp["43"])
-        outstr += f'">\n</a-box>\n </a-entity>\n'
+        if temp['alert'] == 'None':#we have 6 planes, not a box
+            #wall top
+            outstr += f'<a-plane id="wall-top-{x}" \n'
+            outstr += f'position="{float(temp["41"])/2} {temp["43"]} {-float(temp["42"])/2}" \n'
+            outstr += f'rotation="-90 0 0" \n'
+            outstr += f'width="{fabs(float(temp["41"]))}" height="{fabs(float(temp["42"]))}" \n'
+            outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
+            outstr += self.is_repeat(temp["repeat"], temp["41"], temp["42"])
+            outstr += '">\n</a-plane> \n'
+            #wall bottom
+            outstr += f'<a-plane id="wall-bottom-{x}" \n'
+            outstr += f'position="{float(temp["41"])/2} 0 {-float(temp["42"])/2}" \n'
+            outstr += f'rotation="90 0 0" \n'
+            outstr += f'width="{fabs(float(temp["41"]))}" height="{fabs(float(temp["42"]))}" \n'
+            outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
+            outstr += self.is_repeat(temp["repeat"], temp["41"], temp["42"])
+            outstr += '">\n</a-plane> \n'
+            #wall inside
+            outstr += f'<a-plane id="wall-inside-{x}" \n'
+            outstr += f'position="{float(temp["41"])/2} {float(temp["43"])/2} 0" \n'
+            if float(temp['42']) < 0:
+                outstr += 'rotation="0 180 0" \n'
+            outstr += f'width="{fabs(float(temp["41"]))}" height="{fabs(float(temp["43"]))}" \n'
+            outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
+            outstr += self.is_repeat(temp["repeat"], temp["41"], temp["43"])
+            outstr += '">\n</a-plane> \n'
+            #wall outside
+            outstr += f'<a-plane id="wall-outside-{x}" \n'
+            outstr += f'position="{float(temp["41"])/2} {float(temp["43"])/2} {-float(temp["42"])}" \n'
+            if float(temp['42']) > 0:
+                outstr += 'rotation="0 180 0" \n'
+            outstr += f'width="{fabs(float(temp["41"]))}" height="{fabs(float(temp["43"]))}" \n'
+            outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
+            outstr += self.is_repeat(temp["repeat"], temp["41"], temp["43"])
+            outstr += '">\n</a-plane> \n'
+            #wall left
+            outstr += f'<a-plane id="wall-left-{x}" \n'
+            outstr += f'position="0 {float(temp["43"])/2} {-float(temp["42"])/2}" \n'
+            if float(temp['41']) > 0:
+                outstr += 'rotation="0 -90 0" \n'
+            else:
+                outstr += 'rotation="0 90 0" \n'
+            outstr += f'width="{fabs(float(temp["42"]))}" height="{fabs(float(temp["43"]))}" \n'
+            outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
+            outstr += self.is_repeat(temp["repeat"], temp["42"], temp["43"])
+            outstr += '">\n</a-plane> \n'
+            #wall right
+            outstr += f'<a-plane id="wall-right-{x}" \n'
+            outstr += f'position="{temp["41"]} {float(temp["43"])/2} {-float(temp["42"])/2}" \n'
+            if float(temp['41']) > 0:
+                outstr += 'rotation="0 90 0" \n'
+            else:
+                outstr += 'rotation="0 -90 0" \n'
+            outstr += f'width="{fabs(float(temp["42"]))}" height="{fabs(float(temp["43"]))}" \n'
+            outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
+            outstr += self.is_repeat(temp["repeat"], temp["42"], temp["43"])
+            outstr += '">\n</a-plane> \n'
+            outstr += '</a-entity>\n'
+        else:#there is an alert, the wall gets painted red
+            outstr += f'<a-box id="wall-{x}" \n'
+            outstr += f'position="{float(temp["41"])/2} {float(temp["43"])/2} {-float(temp["42"])/2}" \n'
+            outstr += f'scale="{fabs(float(temp["41"]))} {fabs(float(temp["43"]))} {fabs(float(temp["42"]))}" \n'
+            outstr += 'material="color: red;'
+            outstr += '">\n</a-box>\n </a-entity>\n'
         csv_f.write(f'{x},{temp["2"]},{temp["type"]},{temp["10"]},{-float(temp["20"])},{temp["30"]},')
         csv_f.write(f'{temp["210"]},{-float(temp["220"])},{temp["50"]},{temp["41"]},{temp["42"]},{temp["43"]},{wall_weight},{temp["alert"]} \n')
         return outstr
