@@ -171,32 +171,31 @@ class PymbaPage(Page):
                 if key == '8':#layer name
                     temp[key] = value
                 elif key == '10' or key == '11' or key == '12' or key == '13':#X position
-                    temp[key] = value
+                    temp[key] = float(value)
                 elif key == '20' or key == '21' or key == '22' or key == '23':#mirror Y position
-                    value = -float(value)
-                    temp[key] = value
+                    temp[key] = -float(value)
                 elif key == '30' or key == '31' or key == '32' or key == '33':#Z position
-                    temp[key] = value
+                    temp[key] = float(value)
             elif flag == 'block':#stores values for blocks
                 if key == '2' or key == '8':#block name and layer name
                     temp[key] = value
                 elif key == '10' or key == '30':#X Z position
-                    temp[key] = value
+                    temp[key] = float(value)
                 elif key == '20':#Y position, mirrored
                     temp[key] = -float(value)
                 elif key == '50':#Z rotation
-                    temp[key] = value
+                    temp[key] = float(value)
                 elif key == '41' or key == '42' or key == '43':#scale values
-                    temp[key] = value
+                    temp[key] = float(value)
                 elif key == '210':#X of OCS unitary vector
                     Az_1 = float(value)
-                    P_x = float(temp['10'])
+                    P_x = temp['10']
                 elif key == '220':#Y of OCS unitary vector
                     Az_2 = float(value)
-                    P_y = -float(temp['20'])#reset original value
+                    P_y = -temp['20']#reset original value
                 elif key == '230':#Z of OCS unitary vector
                     Az_3 = float(value)
-                    P_z = float(temp['30'])
+                    P_z = temp['30']
                     #arbitrary axis algorithm
                     #see if OCS z vector is close to world Z axis
                     if fabs(Az_1) < (1/64) and fabs(Az_2) < (1/64):
@@ -224,9 +223,9 @@ class PymbaPage(Page):
                     temp['20'] = P_x*Ax_2+P_y*Ay_2+P_z*Az_2
                     temp['30'] = P_x*Ax_3+P_y*Ay_3+P_z*Az_3
                     #OCS X vector translated into WCS
-                    Ax_1 = ((P_x+cos(radians(float(temp['50']))))*Ax_1+(P_y+sin(radians(float(temp['50']))))*Ay_1+P_z*Az_1)-temp['10']
-                    Ax_2 = ((P_x+cos(radians(float(temp['50']))))*Ax_2+(P_y+sin(radians(float(temp['50']))))*Ay_2+P_z*Az_2)-temp['20']
-                    Ax_3 = ((P_x+cos(radians(float(temp['50']))))*Ax_3+(P_y+sin(radians(float(temp['50']))))*Ay_3+P_z*Az_3)-temp['30']
+                    Ax_1 = ((P_x+cos(radians(temp['50'])))*Ax_1+(P_y+sin(radians(temp['50'])))*Ay_1+P_z*Az_1)-temp['10']
+                    Ax_2 = ((P_x+cos(radians(temp['50'])))*Ax_2+(P_y+sin(radians(temp['50'])))*Ay_2+P_z*Az_2)-temp['20']
+                    Ax_3 = ((P_x+cos(radians(temp['50'])))*Ax_3+(P_y+sin(radians(temp['50'])))*Ay_3+P_z*Az_3)-temp['30']
                     #cross product for OCS y vector, normalized
                     Ay_1 = Az_2*Ax_3-Az_3*Ax_2
                     Ay_2 = Az_3*Ax_1-Az_1*Ax_3
@@ -320,11 +319,11 @@ class PymbaPage(Page):
                         output[x] = self.make_plane(x, temp)
 
                     elif temp['2'] == 'floor':#left for legacy
-                        temp['210'] = float(temp['210']) - 90
+                        temp['210'] = temp['210'] - 90
                         output[x] = self.make_plane(x, temp)
 
                     elif temp['2'] == 'ceiling':#left for legacy
-                        temp['210'] = float(temp['210']) + 90
+                        temp['210'] = temp['210'] + 90
                         output[x] = self.make_plane(x, temp)
 
                     elif temp['2'] == 'light' or temp['2'] == 'a-light':
@@ -370,8 +369,8 @@ class PymbaPage(Page):
         outstr += f'position="{temp["10"]} {temp["30"]} {temp["20"]}" \n'
         outstr += f'rotation="{temp["210"]} {temp["50"]} {temp["220"]}">\n'
         outstr += f'<a-box id="box-{x}" \n'
-        outstr += f'position="{float(temp["41"])/2} {float(temp["43"])/2} {-float(temp["42"])/2}" \n'
-        outstr += f'scale="{fabs(float(temp["41"]))} {fabs(float(temp["43"]))} {fabs(float(temp["42"]))}" \n'
+        outstr += f'position="{temp["41"]/2} {temp["43"]/2} {-temp["42"]/2}" \n'
+        outstr += f'scale="{fabs(temp["41"])} {fabs(temp["43"])} {fabs(temp["42"])}" \n'
         outstr += 'geometry="'
         try:
             if temp['segments-depth']!='1':
@@ -393,10 +392,10 @@ class PymbaPage(Page):
         outstr += f'position="{temp["10"]} {temp["30"]} {temp["20"]}" \n'
         outstr += f'rotation="{temp["210"]} {temp["50"]} {temp["220"]}">\n'
         outstr += f'<a-cone id="cone-{x}" \n'
-        outstr += f'position="0 {float(temp["43"])/2} 0" \n'
+        outstr += f'position="0 {temp["43"]/2} 0" \n'
         if float(temp['43']) < 0:
             outstr += 'rotation="180 0 0">\n'
-        outstr += f'scale="{fabs(float(temp["41"]))} {fabs(float(temp["43"]))} {fabs(float(temp["42"]))}" \n'
+        outstr += f'scale="{fabs(temp["41"])} {fabs(temp["43"])} {fabs(temp["42"])}" \n'
         outstr += 'geometry="'
         try:
             if temp['open-ended']!='false':
@@ -426,7 +425,7 @@ class PymbaPage(Page):
         outstr += f'<a-circle id="circle-{x}" \n'
         if temp['2'] == 'circle':
             outstr += f'rotation="-90 0 0"\n'
-        outstr += f'radius="{fabs(float(temp["41"]))}" \n'
+        outstr += f'radius="{fabs(temp["41"])}" \n'
         outstr += 'geometry="'
         try:
             if temp['segments']!='32':
@@ -448,10 +447,10 @@ class PymbaPage(Page):
         outstr += f'position="{temp["10"]} {temp["30"]} {temp["20"]}" \n'
         outstr += f'rotation="{temp["210"]} {temp["50"]} {temp["220"]}">\n'
         outstr += f'<a-cylinder id="cylinder-{x}" \n'
-        outstr += f'position="0 {float(temp["43"])/2} 0" \n'
+        outstr += f'position="0 {temp["43"]/2} 0" \n'
         if float(temp['43']) < 0:
             outstr += 'rotation="180 0 0">\n'
-        outstr += f'scale="{fabs(float(temp["41"]))} {fabs(float(temp["43"]))} {fabs(float(temp["42"]))}" \n'
+        outstr += f'scale="{fabs(temp["41"])} {fabs(temp["43"])} {fabs(temp["42"])}" \n'
         outstr += 'geometry="'
         try:
             if temp['open-ended']!='false':
@@ -482,7 +481,7 @@ class PymbaPage(Page):
         outstr += f'position="0 {temp["43"]} 0" \n'
         if float(temp['43']) < 0:
             outstr += 'rotation="180 0 0">\n'
-        outstr += f'scale="{fabs(float(temp["41"]))} {fabs(float(temp["43"]))} {fabs(float(temp["42"]))}" \n'
+        outstr += f'scale="{fabs(temp["41"])} {fabs(temp["43"])} {fabs(temp["42"])}" \n'
         outstr += 'geometry="'
         try:
             if temp['phi-length']!='360':
@@ -511,13 +510,13 @@ class PymbaPage(Page):
         outstr += f'rotation="{temp["210"]} {temp["50"]} {temp["220"]}">\n'
         outstr += f'<a-plane id="plane-{x}" \n'
         if temp['2'] == 'look-at':#if it's a look at, it is centered and looks at the camera foot
-            outstr += f'position="0 {float(temp["43"])/2} 0" \n'
+            outstr += f'position="0 {temp["43"]/2} 0" \n'
             outstr += 'look-at="#camera-foot" \n'
         elif temp['2'] == 'ceiling':#if it's a ceiling, correct position
-            outstr += f'position="{float(temp["41"])/2} {-float(temp["43"])/2} 0" \n'
+            outstr += f'position="{temp["41"]/2} {-temp["43"]/2} 0" \n'
         else:#insertion is at corner
-            outstr += f'position="{float(temp["41"])/2} {float(temp["43"])/2} 0" \n'
-        outstr += f'width="{fabs(float(temp["41"]))}" height="{fabs(float(temp["43"]))}" \n'
+            outstr += f'position="{temp["41"]/2} {temp["43"]/2} 0" \n'
+        outstr += f'width="{fabs(temp["41"])}" height="{fabs(temp["43"])}" \n'
         outstr += 'geometry="'
         try:
             if temp['segments-height']!='1':
@@ -635,16 +634,18 @@ class PymbaPage(Page):
                 unit_weight = 0
                 zero_weight = 0
                 for wall_layer in wall_type.wall_layers.all():
-                    if float(wall_layer.thickness) == 0:
+                    wall_layer_thickness = float(wall_layer.thickness)
+                    wall_layer_weight = float(wall_layer.weight)
+                    if wall_layer_thickness == 0:
                         fixed_thickness = False
-                        zero_weight = float(wall_layer.weight)
-                    wall_thickness += float(wall_layer.thickness)
-                    unit_weight += float(wall_layer.thickness)/100 * float(wall_layer.weight)
-                unit_weight += (fabs(float(temp['42'])) - wall_thickness/100) * zero_weight#add eventual zero thickness layer
-                wall_weight = unit_weight * fabs(float(temp['41'])) * fabs(float(temp['43']))#actual wall size
-                if wall_thickness and fixed_thickness and fabs(float(temp['42'])) != wall_thickness/100:
+                        zero_weight = wall_layer_weight
+                    wall_thickness += wall_layer_thickness
+                    unit_weight += wall_layer_thickness/100 * wall_layer_weight
+                unit_weight += (fabs(temp['42']) - wall_thickness/100) * zero_weight#add eventual zero thickness layer
+                wall_weight = unit_weight * fabs(temp['41']) * fabs(temp['43'])#actual wall size
+                if wall_thickness and fixed_thickness and fabs(temp['42']) != wall_thickness/100:
                     temp['alert'] = 'Different than Wall Type'
-                elif fabs(float(temp['42'])) < wall_thickness/100:
+                elif fabs(temp['42']) < wall_thickness/100:
                     temp['alert'] = 'Wall too thin'
                 else:
                     if wall_type.image:
@@ -661,69 +662,69 @@ class PymbaPage(Page):
         if temp['alert'] == 'None':#we have 6 planes, not a box
             #wall top
             outstr += f'<a-plane id="wall-top-{x}" \n'
-            outstr += f'position="{float(temp["41"])/2} {temp["43"]} {-float(temp["42"])/2}" \n'
+            outstr += f'position="{temp["41"]/2} {temp["43"]} {-temp["42"]/2}" \n'
             outstr += f'rotation="-90 0 0" \n'
-            outstr += f'width="{fabs(float(temp["41"]))}" height="{fabs(float(temp["42"]))}" \n'
+            outstr += f'width="{fabs(temp["41"])}" height="{fabs(temp["42"])}" \n'
             outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
             outstr += self.is_repeat(temp["repeat"], temp["41"], temp["42"])
             outstr += '">\n</a-plane> \n'
             #wall bottom
             outstr += f'<a-plane id="wall-bottom-{x}" \n'
-            outstr += f'position="{float(temp["41"])/2} 0 {-float(temp["42"])/2}" \n'
+            outstr += f'position="{temp["41"]/2} 0 {-temp["42"]/2}" \n'
             outstr += f'rotation="90 0 0" \n'
-            outstr += f'width="{fabs(float(temp["41"]))}" height="{fabs(float(temp["42"]))}" \n'
+            outstr += f'width="{fabs(temp["41"])}" height="{fabs(temp["42"])}" \n'
             outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
             outstr += self.is_repeat(temp["repeat"], temp["41"], temp["42"])
             outstr += '">\n</a-plane> \n'
             #wall inside
             outstr += f'<a-plane id="wall-inside-{x}" \n'
-            outstr += f'position="{float(temp["41"])/2} {float(temp["43"])/2} 0" \n'
-            if float(temp['42']) < 0:
+            outstr += f'position="{temp["41"]/2} {temp["43"]/2} 0" \n'
+            if temp['42'] < 0:
                 outstr += 'rotation="0 180 0" \n'
-            outstr += f'width="{fabs(float(temp["41"]))}" height="{fabs(float(temp["43"]))}" \n'
+            outstr += f'width="{fabs(temp["41"])}" height="{fabs(temp["43"])}" \n'
             outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
             outstr += self.is_repeat(temp["repeat"], temp["41"], temp["43"])
             outstr += '">\n</a-plane> \n'
             #wall outside
             outstr += f'<a-plane id="wall-outside-{x}" \n'
-            outstr += f'position="{float(temp["41"])/2} {float(temp["43"])/2} {-float(temp["42"])}" \n'
-            if float(temp['42']) > 0:
+            outstr += f'position="{temp["41"]/2} {temp["43"]/2} {-temp["42"]}" \n'
+            if temp['42'] > 0:
                 outstr += 'rotation="0 180 0" \n'
-            outstr += f'width="{fabs(float(temp["41"]))}" height="{fabs(float(temp["43"]))}" \n'
+            outstr += f'width="{fabs(temp["41"])}" height="{fabs(temp["43"])}" \n'
             outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
             outstr += self.is_repeat(temp["repeat"], temp["41"], temp["43"])
             outstr += '">\n</a-plane> \n'
             #wall left
             outstr += f'<a-plane id="wall-left-{x}" \n'
-            outstr += f'position="0 {float(temp["43"])/2} {-float(temp["42"])/2}" \n'
-            if float(temp['41']) > 0:
+            outstr += f'position="0 {temp["43"]/2} {-temp["42"]/2}" \n'
+            if temp['41'] > 0:
                 outstr += 'rotation="0 -90 0" \n'
             else:
                 outstr += 'rotation="0 90 0" \n'
-            outstr += f'width="{fabs(float(temp["42"]))}" height="{fabs(float(temp["43"]))}" \n'
+            outstr += f'width="{float(temp["42"])}" height="{fabs(temp["43"])}" \n'
             outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
             outstr += self.is_repeat(temp["repeat"], temp["42"], temp["43"])
             outstr += '">\n</a-plane> \n'
             #wall right
             outstr += f'<a-plane id="wall-right-{x}" \n'
-            outstr += f'position="{temp["41"]} {float(temp["43"])/2} {-float(temp["42"])/2}" \n'
-            if float(temp['41']) > 0:
+            outstr += f'position="{temp["41"]} {temp["43"]/2} {-temp["42"]/2}" \n'
+            if temp['41'] > 0:
                 outstr += 'rotation="0 90 0" \n'
             else:
                 outstr += 'rotation="0 -90 0" \n'
-            outstr += f'width="{fabs(float(temp["42"]))}" height="{fabs(float(temp["43"]))}" \n'
+            outstr += f'width="{fabs(temp["42"])}" height="{fabs(temp["43"])}" \n'
             outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
             outstr += self.is_repeat(temp["repeat"], temp["42"], temp["43"])
             outstr += '">\n</a-plane> \n'
             outstr += '</a-entity>\n'
         else:#there is an alert, the wall gets painted red
             outstr += f'<a-box id="wall-{x}" \n'
-            outstr += f'position="{float(temp["41"])/2} {float(temp["43"])/2} {-float(temp["42"])/2}" \n'
-            outstr += f'scale="{fabs(float(temp["41"]))} {fabs(float(temp["43"]))} {fabs(float(temp["42"]))}" \n'
+            outstr += f'position="{temp["41"]/2} {temp["43"]/2} {-temp["42"]/2}" \n'
+            outstr += f'scale="{fabs(temp["41"])} {fabs(temp["43"])} {fabs(temp["42"])}" \n'
             outstr += 'material="color: red;'
             outstr += '">\n</a-box>\n </a-entity>\n'
-        csv_f.write(f'{x},{temp["2"]},{temp["type"]},{temp["10"]},{-float(temp["20"])},{temp["30"]},')
-        csv_f.write(f'{temp["210"]},{-float(temp["220"])},{temp["50"]},{temp["41"]},{temp["42"]},{temp["43"]},{wall_weight},{temp["alert"]} \n')
+        csv_f.write(f'{x},{temp["2"]},{temp["type"]},{temp["10"]},{-temp["20"]},{temp["30"]},')
+        csv_f.write(f'{temp["210"]},{-temp["220"]},{temp["50"]},{temp["41"]},{temp["42"]},{temp["43"]},{wall_weight},{temp["alert"]} \n')
         return outstr
 
 class PymbaPageMaterialImage(Orderable):
