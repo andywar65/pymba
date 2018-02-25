@@ -147,6 +147,10 @@ class PymbaPage(Page):
         wall_children = self.get_children().type(PymbaWallPage).all()
         return wall_children
 
+    def get_finishing_children(self):
+        finishing_children = self.get_children().type(PymbaFinishingPage).all()
+        return finishing_children
+
 #it would be desirable to move all the next functions into a new file and have only models here
     def extract_dxf(self):
         path_to_dxf = os.path.join(settings.MEDIA_ROOT, 'documents', self.dxf_file.filename)
@@ -656,6 +660,10 @@ class PymbaPage(Page):
                         temp['repeat']=True
             except:
                 pass
+        #writing to csv file
+        csv_f.write(f'{x},{temp["2"]},{temp["type"]},{temp["10"]},{-temp["20"]},{temp["30"]},')
+        csv_f.write(f'{temp["210"]},{-temp["220"]},{temp["50"]},{temp["41"]},{temp["42"]},{temp["43"]},{wall_weight},{temp["alert"]} \n')
+        #start wall entity
         outstr = f'<a-entity id="wall-ent-{x}" \n'
         outstr += f'position="{temp["10"]} {temp["30"]} {temp["20"]}" \n'
         outstr += f'rotation="{temp["210"]} {temp["50"]} {temp["220"]}">\n'
@@ -678,24 +686,39 @@ class PymbaPage(Page):
             outstr += '">\n</a-plane> \n'
 
             #wall inside
-            outstr += f'<a-entity id="wall-inside-ent-{x}" \n'
+            outstr += f'<a-entity id="wall-in-ent-{x}" \n'
             outstr += f'position="{temp["41"]/2} 0 0" \n'
             if temp['42'] < 0:
-                outstr += 'rotation="0 180 0" \n'
-            outstr += f'><a-plane id="wall-inside-{x}" \n'
-            outstr += f'position="0 {temp["43"]/2} 0" \n'
-            outstr += f'width="{fabs(temp["41"])}" height="{fabs(temp["43"])}" \n'
-            outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
-            outstr += self.is_repeat(temp["repeat"], temp["41"], temp["43"])
-            outstr += '">\n</a-plane> \n'
-            outstr += '</a-entity> \n'
+                outstr += 'rotation="0 180 0"> \n'
+            else:
+                outstr += '> \n'
+            try:
+                wall_finishing = wall_finishings.get(title = temp['in'])
+                tiling_height = float(wall_finishing.tiling_height)/100
+                skirting_height = float(wall_finishing.skirting_height)/100
+                if tiling_height > temp['43']:
+                    tiling_height = temp['43']
+                if skirting_height > tiling_height:
+                    skirting_height = tiling_height
+                tiling_height = tiling_height - skirting_height
+                wall_height = temp['43'] - tiling_height - skirting_height
+            except:
+                outstr += f'<a-plane id="wall-in-{x}" \n'
+                outstr += f'position="0 {temp["43"]/2} 0" \n'
+                outstr += f'width="{fabs(temp["41"])}" height="{fabs(temp["43"])}" \n'
+                outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
+                outstr += self.is_repeat(temp["repeat"], temp["41"], temp["43"])
+                outstr += '">\n</a-plane> \n'
+                outstr += '</a-entity> \n'
 
             #wall outside
-            outstr += f'<a-entity id="wall-outside-ent-{x}" \n'
+            outstr += f'<a-entity id="wall-out-ent-{x}" \n'
             outstr += f'position="{temp["41"]/2} 0 {-temp["42"]}" \n'
             if temp['42'] > 0:
-                outstr += 'rotation="0 180 0" \n'
-            outstr += f'><a-plane id="wall-outside-{x}" \n'
+                outstr += 'rotation="0 180 0"> \n'
+            else:
+                outstr += '> \n'
+            outstr += f'<a-plane id="wall-out-{x}" \n'
             outstr += f'position="0 {temp["43"]/2} 0" \n'
             outstr += f'width="{fabs(temp["41"])}" height="{fabs(temp["43"])}" \n'
             outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
@@ -707,10 +730,10 @@ class PymbaPage(Page):
             outstr += f'<a-entity id="wall-left-ent-{x}" \n'
             outstr += f'position="0 0 {-temp["42"]/2}" \n'
             if temp['41'] > 0:
-                outstr += 'rotation="0 -90 0" \n'
+                outstr += 'rotation="0 -90 0"> \n'
             else:
-                outstr += 'rotation="0 90 0" \n'
-            outstr += f'><a-plane id="wall-left-{x}" \n'
+                outstr += 'rotation="0 90 0"> \n'
+            outstr += f'<a-plane id="wall-left-{x}" \n'
             outstr += f'position="0 {temp["43"]/2} 0" \n'
             outstr += f'width="{float(temp["42"])}" height="{fabs(temp["43"])}" \n'
             outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
@@ -722,10 +745,10 @@ class PymbaPage(Page):
             outstr += f'<a-entity id="wall-right-ent-{x}" \n'
             outstr += f'position="{temp["41"]} 0 {-temp["42"]/2}" \n'
             if temp['41'] > 0:
-                outstr += 'rotation="0 90 0" \n'
+                outstr += 'rotation="0 90 0"> \n'
             else:
-                outstr += 'rotation="0 -90 0" \n'
-            outstr += f'><a-plane id="wall-right-{x}" \n'
+                outstr += 'rotation="0 -90 0"> \n'
+            outstr += f'<a-plane id="wall-right-{x}" \n'
             outstr += f'position="0 {temp["43"]/2} 0" \n'
             outstr += f'width="{fabs(temp["42"])}" height="{fabs(temp["43"])}" \n'
             outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
@@ -735,13 +758,29 @@ class PymbaPage(Page):
             outstr += '</a-entity>\n'
 
         else:#there is an alert, the wall gets painted red
-            outstr += f'<a-box id="wall-{x}" \n'
+            outstr += f'<a-box id="wall-alert-{x}" \n'
             outstr += f'position="{temp["41"]/2} {temp["43"]/2} {-temp["42"]/2}" \n'
             outstr += f'scale="{fabs(temp["41"])} {fabs(temp["43"])} {fabs(temp["42"])}" \n'
             outstr += 'material="color: red;'
             outstr += '">\n</a-box>\n </a-entity>\n'
-        csv_f.write(f'{x},{temp["2"]},{temp["type"]},{temp["10"]},{-temp["20"]},{temp["30"]},')
-        csv_f.write(f'{temp["210"]},{-temp["220"]},{temp["50"]},{temp["41"]},{temp["42"]},{temp["43"]},{wall_weight},{temp["alert"]} \n')
+
+        return outstr
+
+    def make_wall_finishing(self, x, temp, wall_finishings, surface):
+        try:
+            outstr = f'<a-plane id="wall-{surface}-{x}" \n'
+            outstr += f'position="0 {temp["43"]/2} 0" \n'
+            outstr += f'width="{fabs(temp["41"])}" height="{fabs(temp["43"])}" \n'
+            outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
+            outstr += self.is_repeat(temp["repeat"], temp["41"], temp["43"])
+            outstr += '">\n</a-plane> \n'
+        except:
+            outstr = f'<a-plane id="wall-{surface}-{x}" \n'
+            outstr += f'position="0 {temp["43"]/2} 0" \n'
+            outstr += f'width="{fabs(temp["41"])}" height="{fabs(temp["43"])}" \n'
+            outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
+            outstr += self.is_repeat(temp["repeat"], temp["41"], temp["43"])
+            outstr += '">\n</a-plane> \n'
         return outstr
 
 class PymbaPageMaterialImage(Orderable):

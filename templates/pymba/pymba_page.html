@@ -26,7 +26,7 @@
 			  {% for material in page.material_images.all %}
 			   {% if material.image %}
 			    {% image material.image original as temp_image %}
-			     <a-img id="image-{{ material.layer }}" 
+			     <img id="image-{{ material.layer }}" 
 			     src="{{ temp_image.url }}">
 			   {% endif %}
 			  {% endfor %}
@@ -34,7 +34,25 @@
 			  {% for wall in page.get_wall_children %}
 			   {% if wall.specific.image %}
 			    {% image wall.specific.image original as temp_image %}
-			     <a-img id="image-wall-{{ wall }}" 
+			     <img id="image-wall-{{ wall }}" 
+			     src="{{ temp_image.url }}">
+			   {% endif %}
+			  {% endfor %}
+
+			  {% for finishing in page.get_finishing_children %}
+			   {% if finishing.specific.image %}
+			    {% image finishing.specific.image original as temp_image %}
+			     <img id="image-finishing-{{ finishing }}" 
+			     src="{{ temp_image.url }}">
+			   {% endif %}
+			   {% if finishing.specific.tiling_image %}
+			    {% image finishing.specific.tiling_image original as temp_image %}
+			     <img id="image-tiling-{{ finishing }}" 
+			     src="{{ temp_image.url }}">
+			   {% endif %}
+			   {% if finishing.specific.skirting_image %}
+			    {% image finishing.specific.skirting_image original as temp_image %}
+			     <img id="image-skirting-{{ finishing }}" 
 			     src="{{ temp_image.url }}">
 			   {% endif %}
 			  {% endfor %}
