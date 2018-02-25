@@ -676,47 +676,64 @@ class PymbaPage(Page):
             outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
             outstr += self.is_repeat(temp["repeat"], temp["41"], temp["42"])
             outstr += '">\n</a-plane> \n'
+
             #wall inside
-            outstr += f'<a-plane id="wall-inside-{x}" \n'
-            outstr += f'position="{temp["41"]/2} {temp["43"]/2} 0" \n'
+            outstr += f'<a-entity id="wall-inside-ent-{x}" \n'
+            outstr += f'position="{temp["41"]/2} 0 0" \n'
             if temp['42'] < 0:
                 outstr += 'rotation="0 180 0" \n'
+            outstr += f'><a-plane id="wall-inside-{x}" \n'
+            outstr += f'position="0 {temp["43"]/2} 0" \n'
             outstr += f'width="{fabs(temp["41"])}" height="{fabs(temp["43"])}" \n'
             outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
             outstr += self.is_repeat(temp["repeat"], temp["41"], temp["43"])
             outstr += '">\n</a-plane> \n'
+            outstr += '</a-entity> \n'
+
             #wall outside
-            outstr += f'<a-plane id="wall-outside-{x}" \n'
-            outstr += f'position="{temp["41"]/2} {temp["43"]/2} {-temp["42"]}" \n'
+            outstr += f'<a-entity id="wall-outside-ent-{x}" \n'
+            outstr += f'position="{temp["41"]/2} 0 {-temp["42"]}" \n'
             if temp['42'] > 0:
                 outstr += 'rotation="0 180 0" \n'
+            outstr += f'><a-plane id="wall-outside-{x}" \n'
+            outstr += f'position="0 {temp["43"]/2} 0" \n'
             outstr += f'width="{fabs(temp["41"])}" height="{fabs(temp["43"])}" \n'
             outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
             outstr += self.is_repeat(temp["repeat"], temp["41"], temp["43"])
             outstr += '">\n</a-plane> \n'
+            outstr += '</a-entity> \n'
+
             #wall left
-            outstr += f'<a-plane id="wall-left-{x}" \n'
-            outstr += f'position="0 {temp["43"]/2} {-temp["42"]/2}" \n'
+            outstr += f'<a-entity id="wall-left-ent-{x}" \n'
+            outstr += f'position="0 0 {-temp["42"]/2}" \n'
             if temp['41'] > 0:
                 outstr += 'rotation="0 -90 0" \n'
             else:
                 outstr += 'rotation="0 90 0" \n'
+            outstr += f'><a-plane id="wall-left-{x}" \n'
+            outstr += f'position="0 {temp["43"]/2} 0" \n'
             outstr += f'width="{float(temp["42"])}" height="{fabs(temp["43"])}" \n'
             outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
             outstr += self.is_repeat(temp["repeat"], temp["42"], temp["43"])
             outstr += '">\n</a-plane> \n'
+            outstr += '</a-entity> \n'
+
             #wall right
-            outstr += f'<a-plane id="wall-right-{x}" \n'
-            outstr += f'position="{temp["41"]} {temp["43"]/2} {-temp["42"]/2}" \n'
+            outstr += f'<a-entity id="wall-right-ent-{x}" \n'
+            outstr += f'position="{temp["41"]} 0 {-temp["42"]/2}" \n'
             if temp['41'] > 0:
                 outstr += 'rotation="0 90 0" \n'
             else:
                 outstr += 'rotation="0 -90 0" \n'
+            outstr += f'><a-plane id="wall-right-{x}" \n'
+            outstr += f'position="0 {temp["43"]/2} 0" \n'
             outstr += f'width="{fabs(temp["42"])}" height="{fabs(temp["43"])}" \n'
             outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
             outstr += self.is_repeat(temp["repeat"], temp["42"], temp["43"])
             outstr += '">\n</a-plane> \n'
+            outstr += '</a-entity> \n'
             outstr += '</a-entity>\n'
+
         else:#there is an alert, the wall gets painted red
             outstr += f'<a-box id="wall-{x}" \n'
             outstr += f'position="{temp["41"]/2} {temp["43"]/2} {-temp["42"]/2}" \n'
