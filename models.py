@@ -664,12 +664,12 @@ class PymbaPage(Page):
         csv_f.write(f'{x},{temp["2"]},{temp["type"]},{temp["10"]},{-temp["20"]},{temp["30"]},')
         csv_f.write(f'{temp["210"]},{-temp["220"]},{temp["50"]},{temp["41"]},{temp["42"]},{temp["43"]},{wall_weight},{temp["alert"]} \n')
         #start wall entity
-        outstr = f'<a-entity id="wall-ent-{x}" \n'
+        outstr = f'<a-entity id="wall-{x}-ent" \n'
         outstr += f'position="{temp["10"]} {temp["30"]} {temp["20"]}" \n'
         outstr += f'rotation="{temp["210"]} {temp["50"]} {temp["220"]}">\n'
         if temp['alert'] == 'None':#we have 6 planes, not a box
             #wall top
-            outstr += f'<a-plane id="wall-top-{x}" \n'
+            outstr += f'<a-plane id="wall-{x}-top" \n'
             outstr += f'position="{temp["41"]/2} {temp["43"]} {-temp["42"]/2}" \n'
             outstr += f'rotation="-90 0 0" \n'
             outstr += f'width="{fabs(temp["41"])}" height="{fabs(temp["42"])}" \n'
@@ -677,7 +677,7 @@ class PymbaPage(Page):
             outstr += self.is_repeat(temp["repeat"], temp["41"], temp["42"])
             outstr += '">\n</a-plane> \n'
             #wall bottom
-            outstr += f'<a-plane id="wall-bottom-{x}" \n'
+            outstr += f'<a-plane id="wall-{x}-bottom" \n'
             outstr += f'position="{temp["41"]/2} 0 {-temp["42"]/2}" \n'
             outstr += f'rotation="90 0 0" \n'
             outstr += f'width="{fabs(temp["41"])}" height="{fabs(temp["42"])}" \n'
@@ -686,39 +686,25 @@ class PymbaPage(Page):
             outstr += '">\n</a-plane> \n'
 
             #wall inside
-            outstr += f'<a-entity id="wall-in-ent-{x}" \n'
+            outstr += f'<a-entity id="wall-{x}-in-ent" \n'
             outstr += f'position="{temp["41"]/2} 0 0" \n'
             if temp['42'] < 0:
                 outstr += 'rotation="0 180 0"> \n'
             else:
                 outstr += '> \n'
-            try:
-                wall_finishing = wall_finishings.get(title = temp['in'])
-                tiling_height = float(wall_finishing.tiling_height)/100
-                skirting_height = float(wall_finishing.skirting_height)/100
-                if tiling_height > temp['43']:
-                    tiling_height = temp['43']
-                if skirting_height > tiling_height:
-                    skirting_height = tiling_height
-                tiling_height = tiling_height - skirting_height
-                wall_height = temp['43'] - tiling_height - skirting_height
-            except:
-                outstr += f'<a-plane id="wall-in-{x}" \n'
-                outstr += f'position="0 {temp["43"]/2} 0" \n'
-                outstr += f'width="{fabs(temp["41"])}" height="{fabs(temp["43"])}" \n'
-                outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
-                outstr += self.is_repeat(temp["repeat"], temp["41"], temp["43"])
-                outstr += '">\n</a-plane> \n'
-                outstr += '</a-entity> \n'
+            side = 'in'
+            width = temp['41']
+            outstr += self.make_wall_finishing(x, temp, wall_finishings, width, side)
+            outstr += '</a-entity> \n'
 
             #wall outside
-            outstr += f'<a-entity id="wall-out-ent-{x}" \n'
+            outstr += f'<a-entity id="wall-{x}-out-ent" \n'
             outstr += f'position="{temp["41"]/2} 0 {-temp["42"]}" \n'
             if temp['42'] > 0:
                 outstr += 'rotation="0 180 0"> \n'
             else:
                 outstr += '> \n'
-            outstr += f'<a-plane id="wall-out-{x}" \n'
+            outstr += f'<a-plane id="wall-{x}-out" \n'
             outstr += f'position="0 {temp["43"]/2} 0" \n'
             outstr += f'width="{fabs(temp["41"])}" height="{fabs(temp["43"])}" \n'
             outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
@@ -727,13 +713,13 @@ class PymbaPage(Page):
             outstr += '</a-entity> \n'
 
             #wall left
-            outstr += f'<a-entity id="wall-left-ent-{x}" \n'
+            outstr += f'<a-entity id="wall-{x}-left-ent" \n'
             outstr += f'position="0 0 {-temp["42"]/2}" \n'
             if temp['41'] > 0:
                 outstr += 'rotation="0 -90 0"> \n'
             else:
                 outstr += 'rotation="0 90 0"> \n'
-            outstr += f'<a-plane id="wall-left-{x}" \n'
+            outstr += f'<a-plane id="wall-{x}-left" \n'
             outstr += f'position="0 {temp["43"]/2} 0" \n'
             outstr += f'width="{float(temp["42"])}" height="{fabs(temp["43"])}" \n'
             outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
@@ -742,13 +728,13 @@ class PymbaPage(Page):
             outstr += '</a-entity> \n'
 
             #wall right
-            outstr += f'<a-entity id="wall-right-ent-{x}" \n'
+            outstr += f'<a-entity id="wall-{x}-right-ent" \n'
             outstr += f'position="{temp["41"]} 0 {-temp["42"]/2}" \n'
             if temp['41'] > 0:
                 outstr += 'rotation="0 90 0"> \n'
             else:
                 outstr += 'rotation="0 -90 0"> \n'
-            outstr += f'<a-plane id="wall-right-{x}" \n'
+            outstr += f'<a-plane id="wall-{x}-right" \n'
             outstr += f'position="0 {temp["43"]/2} 0" \n'
             outstr += f'width="{fabs(temp["42"])}" height="{fabs(temp["43"])}" \n'
             outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
@@ -758,7 +744,7 @@ class PymbaPage(Page):
             outstr += '</a-entity>\n'
 
         else:#there is an alert, the wall gets painted red
-            outstr += f'<a-box id="wall-alert-{x}" \n'
+            outstr += f'<a-box id="wall-{x}-alert" \n'
             outstr += f'position="{temp["41"]/2} {temp["43"]/2} {-temp["42"]/2}" \n'
             outstr += f'scale="{fabs(temp["41"])} {fabs(temp["43"])} {fabs(temp["42"])}" \n'
             outstr += 'material="color: red;'
@@ -766,20 +752,41 @@ class PymbaPage(Page):
 
         return outstr
 
-    def make_wall_finishing(self, x, temp, wall_finishings, surface):
+    def make_wall_finishing(self, x, temp, wall_finishings, width, side):
         try:
-            outstr = f'<a-plane id="wall-{surface}-{x}" \n'
-            outstr += f'position="0 {temp["43"]/2} 0" \n'
-            outstr += f'width="{fabs(temp["41"])}" height="{fabs(temp["43"])}" \n'
-            outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
-            outstr += self.is_repeat(temp["repeat"], temp["41"], temp["43"])
+            wall_finishing = wall_finishings.get(title = temp[side])
+            tiling_height = fabs(float(wall_finishing.tiling_height))/100*temp['43']/fabs(temp['43'])
+            skirting_height = fabs(float(wall_finishing.skirting_height))/100*temp['43']/fabs(temp['43'])
+            if fabs(tiling_height) > fabs(temp['43']):
+                tiling_height = temp['43']
+            if fabs(skirting_height) > fabs(tiling_height):
+                skirting_height = tiling_height
+            tiling_height = tiling_height - skirting_height
+            wall_height = temp['43'] - tiling_height - skirting_height
+            outstr = f'<a-plane id="wall-{x}-{side}" \n'
+            outstr += f'position="0 {wall_height/2+tiling_height+skirting_height} 0" \n'
+            outstr += f'width="{fabs(width)}" height="{fabs(wall_height)}" \n'
+            outstr += f'material="src: #image-finishing-{wall_finishing.title}; color: {wall_finishing.color}'
+            outstr += self.is_repeat(wall_finishing.pattern, width, wall_height)
+            outstr += '">\n</a-plane> \n'
+            outstr += f'<a-plane id="wall-{x}-{side}-tiling" \n'
+            outstr += f'position="0 {tiling_height/2+skirting_height} 0" \n'
+            outstr += f'width="{fabs(width)}" height="{fabs(tiling_height)}" \n'
+            outstr += f'material="src: #image-tiling-{wall_finishing.title}; color: {wall_finishing.tiling_color}'
+            outstr += self.is_repeat(wall_finishing.tiling_pattern, width, tiling_height)
+            outstr += '">\n</a-plane> \n'
+            outstr += f'<a-plane id="wall-{x}-{side}-skirting" \n'
+            outstr += f'position="0 {skirting_height/2} 0" \n'
+            outstr += f'width="{fabs(width)}" height="{fabs(skirting_height)}" \n'
+            outstr += f'material="src: #image-skirting-{wall_finishing.title}; color: {wall_finishing.skirting_color}'
+            outstr += self.is_repeat(wall_finishing.skirting_pattern, width, skirting_height)
             outstr += '">\n</a-plane> \n'
         except:
-            outstr = f'<a-plane id="wall-{surface}-{x}" \n'
+            outstr = f'<a-plane id="wall-{x}-{side}" \n'
             outstr += f'position="0 {temp["43"]/2} 0" \n'
-            outstr += f'width="{fabs(temp["41"])}" height="{fabs(temp["43"])}" \n'
+            outstr += f'width="{fabs(width)}" height="{fabs(temp["43"])}" \n'
             outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
-            outstr += self.is_repeat(temp["repeat"], temp["41"], temp["43"])
+            outstr += self.is_repeat(temp["repeat"], width, temp["43"])
             outstr += '">\n</a-plane> \n'
         return outstr
 
