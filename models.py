@@ -704,12 +704,8 @@ class PymbaPage(Page):
                 outstr += 'rotation="0 180 0"> \n'
             else:
                 outstr += '> \n'
-            outstr += f'<a-plane id="wall-{x}-out" \n'
-            outstr += f'position="0 {temp["43"]/2} 0" \n'
-            outstr += f'width="{fabs(temp["41"])}" height="{fabs(temp["43"])}" \n'
-            outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
-            outstr += self.is_repeat(temp["repeat"], temp["41"], temp["43"])
-            outstr += '">\n</a-plane> \n'
+            side = 'out'
+            outstr += self.make_wall_finishing(x, temp, wall_finishings, width, side)
             outstr += '</a-entity> \n'
 
             #wall left
@@ -719,12 +715,9 @@ class PymbaPage(Page):
                 outstr += 'rotation="0 -90 0"> \n'
             else:
                 outstr += 'rotation="0 90 0"> \n'
-            outstr += f'<a-plane id="wall-{x}-left" \n'
-            outstr += f'position="0 {temp["43"]/2} 0" \n'
-            outstr += f'width="{float(temp["42"])}" height="{fabs(temp["43"])}" \n'
-            outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
-            outstr += self.is_repeat(temp["repeat"], temp["42"], temp["43"])
-            outstr += '">\n</a-plane> \n'
+            side = 'left'
+            width = temp['42']
+            outstr += self.make_wall_finishing(x, temp, wall_finishings, width, side)
             outstr += '</a-entity> \n'
 
             #wall right
@@ -734,12 +727,8 @@ class PymbaPage(Page):
                 outstr += 'rotation="0 90 0"> \n'
             else:
                 outstr += 'rotation="0 -90 0"> \n'
-            outstr += f'<a-plane id="wall-{x}-right" \n'
-            outstr += f'position="0 {temp["43"]/2} 0" \n'
-            outstr += f'width="{fabs(temp["42"])}" height="{fabs(temp["43"])}" \n'
-            outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
-            outstr += self.is_repeat(temp["repeat"], temp["42"], temp["43"])
-            outstr += '">\n</a-plane> \n'
+            side = 'right'
+            outstr += self.make_wall_finishing(x, temp, wall_finishings, width, side)
             outstr += '</a-entity> \n'
             outstr += '</a-entity>\n'
 
