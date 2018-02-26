@@ -56,8 +56,8 @@ BIM standard blocks are recognized as real life building elements. By now we hav
 Wall types are defined in the backend as `PYMba Wall Pages`, and must be children of the `Pymba Page` they are related to. Creating a new wall type requires Title, Intro, Image (is it a pattern?) and Color. You can then add as many wall Layers to the Wall Type as you want. Layers require a Material, a Thickness (in centimeters) and a Weight in kilograms per cubic meter.
 The app controls if wall dimensions in CAD are consistent with Wall Type features, i.e. wall thickness. If inconsistency arises, wall is rendered in flat red. 
 
-Wall data is stored in a CSV file downloadable from the frontend. Data includes wall weight.
+Wall data is stored in a CSV file downloadable from the frontend. Data includes wall weight and finishing surfaces.
 
 ### Next improvements
 
-Wall surfaces.
+Door blocks.
