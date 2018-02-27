@@ -51,12 +51,14 @@ enter the Inspector mode, that makes you inspect and modify the entities of the 
 
 ### BIM standard blocks
 
-BIM standard blocks are recognized as real life building elements. By now we have only the `Wall` BIM element. It behaves pretty much as a box, but attributes are different: wall `type` and inside, outside, right and left `finishing`.
+BIM standard blocks are recognized as real life building elements. By now we have only the `Wall` BIM element. It behaves pretty much as a box, but attributes are different: wall `Type` and inside, outside, right and left `Finishing`.
 
-Wall types are defined in the backend as `PYMba Wall Pages`, and must be children of the `Pymba Page` they are related to. Creating a new wall type requires Title, Intro, Image (is it a pattern?) and Color. You can then add as many wall Layers to the Wall Type as you want. Layers require a Material, a Thickness (in centimeters) and a Weight in kilograms per cubic meter.
-The app controls if wall dimensions in CAD are consistent with Wall Type features, i.e. wall thickness. If inconsistency arises, wall is rendered in flat red. 
+Wall types are defined in the backend as `PYMba Wall Pages`, and must be children of the `Pymba Page` they are related to. Creating a new wall type requires `Title`, `Intro`, `Image` (is it a `pattern`?) and `Color`. You can then add as many wall `Layers` to the Wall Type as you want. Layers require a `Material`, a `Thickness` (in centimeters) and a `Weight` in kilograms per cubic meter.
+The app controls if wall dimensions in CAD are consistent with Wall Type features, i.e. wall thickness. If inconsistency arises, wall is rendered in flat red. You can leave a layer with zero thickness to assign the same Wall Type to blocks with different depth.
 
-Wall data is stored in a CSV file downloadable from the frontend. Data includes wall weight and finishing surfaces.
+Finishings are defined in the backend as `PYMba Finishing Pages`, and must be children of the `Pymba Page` they are related to. Creating a new finishing requires `Title`, `Intro`, `Image` (is it a `pattern`?) and `Color` for `Wall`, `Tiling` and `Skirting` appearance. Tiling and Skirting require also `height`, intended as their upper bound with respect to the floor.
+
+Wall data is stored in a `CSV` file downloadable from the frontend. Data includes wall weight and finishing surfaces.
 
 ### Next improvements
 

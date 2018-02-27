@@ -157,7 +157,7 @@ class PymbaPage(Page):
         path_to_csv = os.path.join(settings.MEDIA_ROOT, 'documents', self.slug + '.csv')
         dxf_f = open(path_to_dxf, encoding = 'utf-8')
         csv_f = open(path_to_csv, 'w', encoding = 'utf-8',)
-        csv_f.write('Num,Block/Side,Type,Finishing,X,Y,Z,Rx,Ry,Rz,Width,Depth,Height,Weight, Alert \n')
+        csv_f.write('Num,Layer,Block/Side,Type,Finishing,X,Y,Z,Rx,Ry,Rz,Width,Depth,Height,Weight, Alert \n')
         material_gallery=self.material_images.all()
         wall_types = PymbaWallPage.objects#how can I restrict to children?TO DO
         wall_finishings = PymbaFinishingPage.objects#how can I restrict to children?TO DO
@@ -181,8 +181,11 @@ class PymbaPage(Page):
                 elif key == '30' or key == '31' or key == '32' or key == '33':#Z position
                     temp[key] = float(value)
             elif flag == 'block':#stores values for blocks
-                if key == '2' or key == '8':#block name and layer name
+                if key == '2':#block name
                     temp[key] = value
+                if key == '8':#layer name
+                    temp[key] = value
+                    temp['layer'] = value#sometimes key 8 is replaced, so I need the original layer value
                 elif key == '10' or key == '30':#X Z position
                     temp[key] = float(value)
                 elif key == '20':#Y position, mirrored
@@ -661,7 +664,7 @@ class PymbaPage(Page):
             except:
                 pass
         #writing to csv file
-        csv_f.write(f'{x},{temp["2"]},{temp["type"]},-,{temp["10"]},{-temp["20"]},{temp["30"]},')
+        csv_f.write(f'{x},{temp["layer"]},{temp["2"]},{temp["type"]},-,{temp["10"]},{-temp["20"]},{temp["30"]},')
         csv_f.write(f'{temp["210"]},{-temp["220"]},{temp["50"]},{temp["41"]},{temp["42"]},{temp["43"]},{wall_weight},{temp["alert"]} \n')
         #start wall entity
         outstr = f'<a-entity id="wall-{x}-ent" \n'
@@ -758,21 +761,21 @@ class PymbaPage(Page):
             outstr += f'material="src: #image-finishing-{wall_finishing.title}; color: {wall_finishing.color}'
             outstr += self.is_repeat(wall_finishing.pattern, width, wall_height)
             outstr += '">\n</a-plane> \n'
-            csv_f.write(f'{x},{side},{wall_finishing.title},Wall,-,-,-,-,-,-,{width},-,{wall_height},-,- \n')
+            csv_f.write(f'{x},{temp["layer"]},a-wall/{side},{wall_finishing.title},Wall,-,-,-,-,-,-,{width},-,{wall_height},-,- \n')
             outstr += f'<a-plane id="wall-{x}-{side}-tiling" \n'
             outstr += f'position="0 {tiling_height/2+skirting_height} 0" \n'
             outstr += f'width="{fabs(width)}" height="{fabs(tiling_height)}" \n'
             outstr += f'material="src: #image-tiling-{wall_finishing.title}; color: {wall_finishing.tiling_color}'
             outstr += self.is_repeat(wall_finishing.tiling_pattern, width, tiling_height)
             outstr += '">\n</a-plane> \n'
-            csv_f.write(f'{x},{side},{wall_finishing.title},Tiling,-,-,-,-,-,-,{width},-,{tiling_height},-,- \n')
+            csv_f.write(f'{x},{temp["layer"]},a-wall/{side},{wall_finishing.title},Tiling,-,-,-,-,-,-,{width},-,{tiling_height},-,- \n')
             outstr += f'<a-plane id="wall-{x}-{side}-skirting" \n'
             outstr += f'position="0 {skirting_height/2} 0" \n'
             outstr += f'width="{fabs(width)}" height="{fabs(skirting_height)}" \n'
             outstr += f'material="src: #image-skirting-{wall_finishing.title}; color: {wall_finishing.skirting_color}'
             outstr += self.is_repeat(wall_finishing.skirting_pattern, width, skirting_height)
             outstr += '">\n</a-plane> \n'
-            csv_f.write(f'{x},{side},{wall_finishing.title},Skirting,-,-,-,-,-,-,{width},-,{skirting_height},-,- \n')
+            csv_f.write(f'{x},{temp["layer"]},a-wall/{side},{wall_finishing.title},Skirting,-,-,-,-,-,-,{width},-,{skirting_height},-,- \n')
         except:
             outstr = f'<a-plane id="wall-{x}-{side}" \n'
             outstr += f'position="0 {temp["43"]/2} 0" \n'
