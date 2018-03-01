@@ -51,14 +51,14 @@ enter the Inspector mode, that makes you inspect and modify the entities of the 
 
 ### BIM standard blocks
 
-BIM standard blocks are recognized as real life building elements. By now we have only the `Wall` BIM element. It behaves pretty much as a box, but attributes are different: wall `Type` and inside, outside, right and left `Finishing`.
+BIM standard blocks are recognized as real life building elements. By now we have only `Wall` and `Slab` BIM element. They behave pretty much as a box, but attributes are different: wall/slab `Type` and `Finishing` for each side.
 
-Wall types are defined in the backend as `PYMba Wall Pages`, and must be children of the `Pymba Page` they are related to. Creating a new wall type requires `Title`, `Intro`, `Image` (is it a `pattern`?) and `Color`. You can then add as many wall `Layers` to the Wall Type as you want. Layers require a `Material`, a `Thickness` (in centimeters) and a `Weight` in kilograms per cubic meter.
-The app controls if wall dimensions in CAD are consistent with Wall Type features, i.e. wall thickness. If inconsistency arises, wall is rendered in flat red. You can leave a layer with zero thickness to assign the same Wall Type to blocks with different depth.
+Wall (and Slab) types are defined in the backend as `PYMba Wall Pages`, and must be children of the `Pymba Page` they are related to. Creating a new wall type requires `Title`, `Intro`, `Image` (is it a `pattern`?) and `Color`. You can then add as many wall `Layers` to the Wall Type as you want. Layers require a `Material`, a `Thickness` (in centimeters) and a `Weight` in kilograms per cubic meter.
+First layer is innermost for Walls and floor for Slabs. The app controls if wall/slab dimensions in CAD are consistent with Wall Type features, i.e. wall/slab thickness. If inconsistency arises, wall/slab is rendered in flat red. You can leave a layer with zero thickness to assign the same Wall Type to blocks with different depth.
 
-Finishings are defined in the backend as `PYMba Finishing Pages`, and must be children of the `Pymba Page` they are related to. Creating a new finishing requires `Title`, `Intro`, `Image` (is it a `pattern`?) and `Color` for `Wall`, `Tiling` and `Skirting` appearance. Tiling and Skirting require also `height`, intended as their upper bound with respect to the floor.
+Finishings are defined in the backend as `PYMba Finishing Pages`, and must be children of the `Pymba Page` they are related to. Creating a new finishing requires `Title`, `Intro`, `Image` (is it a `pattern`?) and `Color` for `General`, `Tiling` and `Skirting` appearance. Tiling and Skirting require also `height`, intended as their upper bound with respect to the floor. Slabs don't use settings for tiling and skirting.
 
-Wall data is stored in a `CSV` file downloadable from the frontend. Data includes wall weight and finishing surfaces.
+Wall data is stored in a `CSV` file downloadable from the frontend. Data includes wall/slab weight and finishing surfaces.
 
 ### Next improvements
 

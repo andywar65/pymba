@@ -375,7 +375,7 @@ class PymbaPage(Page):
         return path_to_csv
 
     def make_box(self, x, temp):
-        outstr = f'<a-entity id="box-ent-{x}" \n'
+        outstr = f'<a-entity id="box-{x}-ent" \n'
         outstr += f'position="{temp["10"]} {temp["30"]} {temp["20"]}" \n'
         outstr += f'rotation="{temp["210"]} {temp["50"]} {temp["220"]}">\n'
         outstr += f'<a-box id="box-{x}" \n'
@@ -398,7 +398,7 @@ class PymbaPage(Page):
         return outstr
 
     def make_cone(self, x, temp):
-        outstr = f'<a-entity id="cone-ent-{x}" \n'
+        outstr = f'<a-entity id="cone-{x}-ent" \n'
         outstr += f'position="{temp["10"]} {temp["30"]} {temp["20"]}" \n'
         outstr += f'rotation="{temp["210"]} {temp["50"]} {temp["220"]}">\n'
         outstr += f'<a-cone id="cone-{x}" \n'
@@ -429,7 +429,7 @@ class PymbaPage(Page):
         return outstr
 
     def make_circle(self, x, temp):
-        outstr = f'<a-entity id="circle-ent-{x}" \n'
+        outstr = f'<a-entity id="circle-{x}-ent" \n'
         outstr += f'position="{temp["10"]} {temp["30"]} {temp["20"]}" \n'
         outstr += f'rotation="{temp["210"]} {temp["50"]} {temp["220"]}">\n'
         outstr += f'<a-circle id="circle-{x}" \n'
@@ -453,7 +453,7 @@ class PymbaPage(Page):
         return outstr
 
     def make_cylinder(self, x, temp):
-        outstr = f'<a-entity id="cylinder-ent-{x}" \n'
+        outstr = f'<a-entity id="cylinder-{x}-ent" \n'
         outstr += f'position="{temp["10"]} {temp["30"]} {temp["20"]}" \n'
         outstr += f'rotation="{temp["210"]} {temp["50"]} {temp["220"]}">\n'
         outstr += f'<a-cylinder id="cylinder-{x}" \n'
@@ -484,7 +484,7 @@ class PymbaPage(Page):
         return outstr
 
     def make_sphere(self, x, temp):
-        outstr = f'<a-entity id="sphere-ent-{x}" \n'
+        outstr = f'<a-entity id="sphere-{x}-ent" \n'
         outstr += f'position="{temp["10"]} {temp["30"]} {temp["20"]}" \n'
         outstr += f'rotation="{temp["210"]} {temp["50"]} {temp["220"]}">\n'
         outstr += f'<a-sphere id="sphere-{x}" \n'
@@ -515,7 +515,7 @@ class PymbaPage(Page):
         return outstr
 
     def make_plane(self, x, temp):
-        outstr = f'<a-entity id="plane-ent-{x}" \n'
+        outstr = f'<a-entity id="plane-{x}-ent" \n'
         outstr += f'position="{temp["10"]} {temp["30"]} {temp["20"]}" \n'
         outstr += f'rotation="{temp["210"]} {temp["50"]} {temp["220"]}">\n'
         outstr += f'<a-plane id="plane-{x}" \n'
