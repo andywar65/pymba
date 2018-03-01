@@ -345,6 +345,9 @@ class PymbaPage(Page):
                     elif temp['2'] == 'a-wall':
                         output[x] = self.make_wall(x, temp, wall_types, wall_finishings, csv_f)
 
+                    elif temp['2'] == 'a-slab':
+                        output[x] = self.make_slab(x, temp, wall_types, wall_finishings, csv_f)
+
                     flag = False
 
                 if value == '3DFACE':#start 3D face
@@ -641,8 +644,8 @@ class PymbaPage(Page):
                 unit_weight = 0
                 zero_weight = 0
                 for wall_layer in wall_type.wall_layers.all():
-                    wall_layer_thickness = float(wall_layer.thickness)
-                    wall_layer_weight = float(wall_layer.weight)
+                    wall_layer_thickness = fabs(float(wall_layer.thickness))
+                    wall_layer_weight = fabs(float(wall_layer.weight))
                     if wall_layer_thickness == 0:
                         fixed_thickness = False
                         zero_weight = wall_layer_weight
@@ -674,7 +677,10 @@ class PymbaPage(Page):
             #wall top
             outstr += f'<a-plane id="wall-{x}-top" \n'
             outstr += f'position="{temp["41"]/2} {temp["43"]} {-temp["42"]/2}" \n'
-            outstr += f'rotation="-90 0 0" \n'
+            if temp['43'] < 0:
+                outstr += f'rotation="90 0 0" \n'
+            else:
+                outstr += f'rotation="-90 0 0" \n'
             outstr += f'width="{fabs(temp["41"])}" height="{fabs(temp["42"])}" \n'
             outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
             outstr += self.is_repeat(temp["repeat"], temp["41"], temp["42"])
@@ -682,7 +688,10 @@ class PymbaPage(Page):
             #wall bottom
             outstr += f'<a-plane id="wall-{x}-bottom" \n'
             outstr += f'position="{temp["41"]/2} 0 {-temp["42"]/2}" \n'
-            outstr += f'rotation="90 0 0" \n'
+            if temp['43'] < 0:
+                outstr += f'rotation="-90 0 0" \n'
+            else:
+                outstr += f'rotation="90 0 0" \n'
             outstr += f'width="{fabs(temp["41"])}" height="{fabs(temp["42"])}" \n'
             outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
             outstr += self.is_repeat(temp["repeat"], temp["41"], temp["42"])
@@ -783,6 +792,136 @@ class PymbaPage(Page):
             outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
             outstr += self.is_repeat(temp["repeat"], width, temp["43"])
             outstr += '">\n</a-plane> \n'
+        return outstr
+
+    def make_slab(self, x, temp, slab_types, slab_finishings, csv_f):
+        temp['alert'] = 'None'#outside the try or they could crash file write
+        slab_weight = 0
+        if temp['type']:
+            try:
+                slab_type = slab_types.get(title = temp['type'])
+                slab_thickness = 0
+                fixed_thickness = True
+                unit_weight = 0
+                zero_weight = 0
+                for slab_layer in slab_type.wall_layers.all():
+                    slab_layer_thickness = fabs(float(slab_layer.thickness))
+                    slab_layer_weight = fabs(float(slab_layer.weight))
+                    if slab_layer_thickness == 0:
+                        fixed_thickness = False
+                        zero_weight = slab_layer_weight
+                    slab_thickness += slab_layer_thickness
+                    unit_weight += slab_layer_thickness/100 * slab_layer_weight
+                unit_weight += (fabs(temp['43']) - slab_thickness/100) * zero_weight#add eventual zero thickness layer
+                slab_weight = unit_weight * fabs(temp['41']) * fabs(temp['42'])#actual slab size
+                if slab_thickness and fixed_thickness and fabs(temp['43']) != slab_thickness/100:
+                    temp['alert'] = 'Different than Wall/Slab Type'
+                elif fabs(temp['43']) < slab_thickness/100:
+                    temp['alert'] = 'Slab too thin'
+                else:
+                    if slab_type.image:
+                        temp['8'] = 'wall-' + slab_type.title
+                    temp['color'] = slab_type.color
+                    temp['repeat']=False
+                    if slab_type.pattern:# == True
+                        temp['repeat']=True
+            except:
+                pass
+        #writing to csv file
+        csv_f.write(f'{x},{temp["layer"]},{temp["2"]},{temp["type"]},-,{temp["10"]},{-temp["20"]},{temp["30"]},')
+        csv_f.write(f'{temp["210"]},{-temp["220"]},{temp["50"]},{temp["41"]},{temp["42"]},{temp["43"]},{slab_weight},{temp["alert"]} \n')
+        #start slab entity
+        outstr = f'<a-entity id="slab-{x}-ent" \n'
+        outstr += f'position="{temp["10"]} {temp["30"]} {temp["20"]}" \n'
+        outstr += f'rotation="{temp["210"]} {temp["50"]} {temp["220"]}">\n'
+        if temp['alert'] == 'None':#we have 6 planes, not a box
+            #slab top (floor)
+            outstr += f'<a-entity id="slab-{x}-floor-ent" \n'
+            outstr += f'position="{temp["41"]/2} {temp["43"]} {-temp["42"]/2}" \n'
+            if temp['43'] < 0:
+                outstr += f'rotation="90 0 0"> \n'
+            else:
+                outstr += f'rotation="-90 0 0"> \n'
+            side = 'floor'
+            outstr += self.make_slab_finishing(x, temp, slab_finishings, side, csv_f)
+            outstr += '</a-entity> \n'
+
+            #slab bottom (ceiling)
+            outstr += f'<a-entity id="slab-{x}-ceiling-ent" \n'
+            outstr += f'position="{temp["41"]/2} 0 {-temp["42"]/2}" \n'
+            if temp['43'] < 0:
+                outstr += f'rotation="-90 0 0"> \n'
+            else:
+                outstr += f'rotation="90 0 0"> \n'
+            side = 'ceiling'
+            outstr += self.make_slab_finishing(x, temp, slab_finishings, side, csv_f)
+            outstr += '</a-entity> \n'
+
+            #slab front
+            outstr += f'<a-plane id="slab-{x}-front" \n'
+            outstr += f'position="{temp["41"]/2} {temp["43"]/2} 0" \n'
+            if temp['42'] < 0:
+                outstr += 'rotation="0 180 0" \n'
+            outstr += f'width="{fabs(temp["41"])}" height="{fabs(temp["43"])}" \n'
+            outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
+            outstr += self.is_repeat(temp["repeat"], temp["41"], temp["43"])
+            outstr += '">\n</a-plane> \n'
+
+            #slab back
+            outstr += f'<a-plane id="slab-{x}-back" \n'
+            outstr += f'position="{temp["41"]/2} {temp["43"]/2} {-temp["42"]}" \n'
+            if temp['42'] > 0:
+                outstr += 'rotation="0 180 0" \n'
+            outstr += f'width="{fabs(temp["41"])}" height="{fabs(temp["43"])}" \n'
+            outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
+            outstr += self.is_repeat(temp["repeat"], temp["41"], temp["43"])
+            outstr += '">\n</a-plane> \n'
+
+            #slab left
+            outstr += f'<a-plane id="slab-{x}-left" \n'
+            outstr += f'position="0 {temp["43"]/2} {-temp["42"]/2}" \n'
+            if temp['41'] > 0:
+                outstr += 'rotation="0 -90 0" \n'
+            else:
+                outstr += 'rotation="0 90 0" \n'
+            outstr += f'width="{fabs(temp["42"])}" height="{fabs(temp["43"])}" \n'
+            outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
+            outstr += self.is_repeat(temp["repeat"], temp["42"], temp["43"])
+            outstr += '">\n</a-plane> \n'
+
+            #slab right
+            outstr += f'<a-plane id="slab-{x}-right" \n'
+            outstr += f'position="{temp["41"]/2} {temp["43"]/2} {-temp["42"]/2}" \n'
+            if temp['41'] > 0:
+                outstr += 'rotation="0 90 0" \n'
+            else:
+                outstr += 'rotation="0 -90 0" \n'
+            outstr += f'width="{fabs(temp["42"])}" height="{fabs(temp["43"])}" \n'
+            outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
+            outstr += self.is_repeat(temp["repeat"], temp["42"], temp["43"])
+            outstr += '">\n</a-plane> \n </a-entity>\n'
+
+        else:#there is an alert, the slab gets painted red
+            outstr += f'<a-box id="slab-{x}-alert" \n'
+            outstr += f'position="{temp["41"]/2} {temp["43"]/2} {-temp["42"]/2}" \n'
+            outstr += f'scale="{fabs(temp["41"])} {fabs(temp["43"])} {fabs(temp["42"])}" \n'
+            outstr += 'material="color: red;'
+            outstr += '">\n</a-box>\n </a-entity>\n'
+
+        return outstr
+
+    def make_slab_finishing(self, x, temp, slab_finishings, side, csv_f):
+        outstr = f'<a-plane id="slab-{x}-{side}" \n'
+        outstr += f'width="{fabs(temp["41"])}" height="{fabs(temp["42"])}" \n'
+        try:
+            slab_finishing = slab_finishings.get(title = temp[side])
+            outstr += f'material="src: #image-finishing-{slab_finishing.title}; color: {slab_finishing.color}'
+            outstr += self.is_repeat(slab_finishing.pattern, temp["41"], temp["42"])
+            csv_f.write(f'{x},{temp["layer"]},a-slab/{side},{slab_finishing.title},-,-,-,-,-,-,-,{temp["41"]},-,{temp["42"]},-,- \n')
+        except:
+            outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
+            outstr += self.is_repeat(temp["repeat"], temp["41"], temp["42"])
+        outstr += '">\n</a-plane> \n'
         return outstr
 
 class PymbaPageMaterialImage(Orderable):
