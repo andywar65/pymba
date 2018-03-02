@@ -51,7 +51,7 @@ enter the Inspector mode, that makes you inspect and modify the entities of the 
 
 ### BIM standard blocks
 
-BIM standard blocks are recognized as real life building elements. By now we have only `Wall` and `Slab` BIM element. They behave pretty much as a box, but attributes are different: wall/slab `Type` and `Finishing` for each side.
+BIM standard blocks are recognized as real life building elements. By now we have only `Wall` and `Slab` BIM elements. They behave pretty much as a box, but attributes are different: we can set a `Type` for each wall/slab and a `Finishing` for each side.
 
 Wall (and Slab) types are defined in the backend as `PYMba Wall Pages`, and must be children of the `Pymba Page` they are related to. Creating a new wall type requires `Title`, `Intro`, `Image` (is it a `pattern`?) and `Color`. You can then add as many wall `Layers` to the Wall Type as you want. Layers require a `Material`, a `Thickness` (in centimeters) and a `Weight` in kilograms per cubic meter.
 First layer is innermost for Walls and floor for Slabs. The app controls if wall/slab dimensions in CAD are consistent with Wall Type features, i.e. wall/slab thickness. If inconsistency arises, wall/slab is rendered in flat red. You can leave a layer with zero thickness to assign the same Wall Type to blocks with different depth.

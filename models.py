@@ -70,7 +70,7 @@ class PymbaFinishingPage(Page):
         ], heading="Skirting"),
     ]
 
-class PymbaWallPage(Page):
+class PymbaPartitionPage(Page):
     intro = models.CharField(max_length=250, null=True, blank=True,)
     image = models.ForeignKey(
         'wagtailimages.Image', 
@@ -93,11 +93,11 @@ class PymbaWallPage(Page):
             FieldPanel('pattern'),
             FieldPanel('color'),
         ], heading="Appearance"),
-        InlinePanel('wall_layers', label="Wall layers",),
+        InlinePanel('part_layers', label="Partition layers",),
     ]
 
-class PymbaWallPageLayers(Orderable):
-    page = ParentalKey(PymbaWallPage, related_name='wall_layers')
+class PymbaPartitionPageLayers(Orderable):
+    page = ParentalKey(PymbaPartitionPage, related_name='part_layers')
     material = models.CharField(max_length=250, default="brick",)
     thickness = models.CharField(max_length=250, default="0",)
     weight = models.CharField(max_length=250, default="0",)
@@ -144,7 +144,7 @@ class PymbaPage(Page):
     ]
 
     def get_wall_children(self):
-        wall_children = self.get_children().type(PymbaWallPage).all()
+        wall_children = self.get_children().type(PymbaPartitionPage).all()
         return wall_children
 
     def get_finishing_children(self):
@@ -159,7 +159,7 @@ class PymbaPage(Page):
         csv_f = open(path_to_csv, 'w', encoding = 'utf-8',)
         csv_f.write('Num,Layer,Block/Side,Type,Finishing,X,Y,Z,Rx,Ry,Rz,Width,Depth,Height,Weight, Alert \n')
         material_gallery=self.material_images.all()
-        wall_types = PymbaWallPage.objects#how can I restrict to children?TO DO
+        wall_types = PymbaPartitionPage.objects#how can I restrict to children?TO DO
         wall_finishings = PymbaFinishingPage.objects#how can I restrict to children?TO DO
         output = {}
         flag = False
@@ -643,7 +643,7 @@ class PymbaPage(Page):
                 fixed_thickness = True
                 unit_weight = 0
                 zero_weight = 0
-                for wall_layer in wall_type.wall_layers.all():
+                for wall_layer in wall_type.part_layers.all():
                     wall_layer_thickness = fabs(float(wall_layer.thickness))
                     wall_layer_weight = fabs(float(wall_layer.weight))
                     if wall_layer_thickness == 0:
@@ -804,7 +804,7 @@ class PymbaPage(Page):
                 fixed_thickness = True
                 unit_weight = 0
                 zero_weight = 0
-                for slab_layer in slab_type.wall_layers.all():
+                for slab_layer in slab_type.part_layers.all():
                     slab_layer_thickness = fabs(float(slab_layer.thickness))
                     slab_layer_weight = fabs(float(slab_layer.weight))
                     if slab_layer_thickness == 0:
@@ -917,7 +917,7 @@ class PymbaPage(Page):
             slab_finishing = slab_finishings.get(title = temp[side])
             outstr += f'material="src: #image-finishing-{slab_finishing.title}; color: {slab_finishing.color}'
             outstr += self.is_repeat(slab_finishing.pattern, temp["41"], temp["42"])
-            csv_f.write(f'{x},{temp["layer"]},a-slab/{side},{slab_finishing.title},-,-,-,-,-,-,-,{temp["41"]},-,{temp["42"]},-,- \n')
+            csv_f.write(f'{x},{temp["layer"]},a-slab/{side},{slab_finishing.title},-,-,-,-,-,-,-,{temp["41"]},{temp["42"]},-,-,- \n')
         except:
             outstr += f'material="src: #image-{temp["8"]}; color: {temp["color"]}'
             outstr += self.is_repeat(temp["repeat"], temp["41"], temp["42"])
