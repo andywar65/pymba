@@ -58,7 +58,7 @@ First layer is innermost for Walls and uppermost for Slabs. The app controls if 
 
 Finishings are defined in the backend as `PYMba Finishing Pages`, and must be children of the `Pymba Page` they are related to. Creating a new finishing requires `Title`, `Intro`, `Image` (is it a `pattern`?) and `Color` for `General`, `Tiling` and `Skirting` appearance. Tiling and Skirting require also `height`, intended as their upper bound with respect to the floor. Slabs don't use settings for tiling and skirting.
 
-Wall data is stored in a `CSV` file downloadable from the frontend. Data includes wall/slab weight and finishing surfaces.
+BIM element data is stored in a `CSV` file downloadable from the frontend. Data includes wall/slab weight and finishing surfaces.
 
 ### Next improvements
 

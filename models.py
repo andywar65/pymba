@@ -841,7 +841,7 @@ class PymbaPage(Page):
         if temp['alert'] == 'None':#we have 6 planes, not a box
             #slab top (floor)
             outstr += f'<a-entity id="slab-{x}-floor-ent" \n'
-            outstr += f'position="{temp["41"]/2} {temp["43"]} {-temp["42"]/2}" \n'
+            outstr += f'position="{temp["41"]/2} 0 {-temp["42"]/2}" \n'
             if temp['43'] < 0:
                 outstr += f'rotation="90 0 0"> \n'
             else:
@@ -852,7 +852,7 @@ class PymbaPage(Page):
 
             #slab bottom (ceiling)
             outstr += f'<a-entity id="slab-{x}-ceiling-ent" \n'
-            outstr += f'position="{temp["41"]/2} 0 {-temp["42"]/2}" \n'
+            outstr += f'position="{temp["41"]/2} {-temp["43"]} {-temp["42"]/2}" \n'
             if temp['43'] < 0:
                 outstr += f'rotation="-90 0 0"> \n'
             else:
@@ -863,7 +863,7 @@ class PymbaPage(Page):
 
             #slab front
             outstr += f'<a-plane id="slab-{x}-front" \n'
-            outstr += f'position="{temp["41"]/2} {temp["43"]/2} 0" \n'
+            outstr += f'position="{temp["41"]/2} {-temp["43"]/2} 0" \n'
             if temp['42'] < 0:
                 outstr += 'rotation="0 180 0" \n'
             outstr += f'width="{fabs(temp["41"])}" height="{fabs(temp["43"])}" \n'
@@ -873,7 +873,7 @@ class PymbaPage(Page):
 
             #slab back
             outstr += f'<a-plane id="slab-{x}-back" \n'
-            outstr += f'position="{temp["41"]/2} {temp["43"]/2} {-temp["42"]}" \n'
+            outstr += f'position="{temp["41"]/2} {-temp["43"]/2} {-temp["42"]}" \n'
             if temp['42'] > 0:
                 outstr += 'rotation="0 180 0" \n'
             outstr += f'width="{fabs(temp["41"])}" height="{fabs(temp["43"])}" \n'
@@ -883,7 +883,7 @@ class PymbaPage(Page):
 
             #slab left
             outstr += f'<a-plane id="slab-{x}-left" \n'
-            outstr += f'position="0 {temp["43"]/2} {-temp["42"]/2}" \n'
+            outstr += f'position="0 {-temp["43"]/2} {-temp["42"]/2}" \n'
             if temp['41'] > 0:
                 outstr += 'rotation="0 -90 0" \n'
             else:
@@ -895,7 +895,7 @@ class PymbaPage(Page):
 
             #slab right
             outstr += f'<a-plane id="slab-{x}-right" \n'
-            outstr += f'position="{temp["41"]/2} {temp["43"]/2} {-temp["42"]/2}" \n'
+            outstr += f'position="{temp["41"]} {-temp["43"]/2} {-temp["42"]/2}" \n'
             if temp['41'] > 0:
                 outstr += 'rotation="0 90 0" \n'
             else:
@@ -907,7 +907,7 @@ class PymbaPage(Page):
 
         else:#there is an alert, the slab gets painted red
             outstr += f'<a-box id="slab-{x}-alert" \n'
-            outstr += f'position="{temp["41"]/2} {temp["43"]/2} {-temp["42"]/2}" \n'
+            outstr += f'position="{temp["41"]/2} {-temp["43"]/2} {-temp["42"]/2}" \n'
             outstr += f'scale="{fabs(temp["41"])} {fabs(temp["43"])} {fabs(temp["42"])}" \n'
             outstr += 'material="color: red;'
             outstr += '">\n</a-box>\n </a-entity>\n'
