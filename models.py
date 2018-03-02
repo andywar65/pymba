@@ -758,11 +758,15 @@ class PymbaPage(Page):
             wall_finishing = wall_finishings.get(title = temp[side])
             tiling_height = fabs(float(wall_finishing.tiling_height))/100*temp['43']/fabs(temp['43'])
             skirting_height = fabs(float(wall_finishing.skirting_height))/100*temp['43']/fabs(temp['43'])
-            if fabs(tiling_height) > fabs(temp['43']):
-                tiling_height = temp['43']
-            if fabs(skirting_height) > fabs(tiling_height):
-                skirting_height = tiling_height
-            tiling_height = tiling_height - skirting_height
+            if tiling_height:
+                if fabs(tiling_height) > fabs(temp['43']):
+                    tiling_height = temp['43']
+                if fabs(skirting_height) > fabs(tiling_height):
+                    skirting_height = tiling_height
+                tiling_height = tiling_height - skirting_height
+            elif skirting_height:
+                if fabs(skirting_height) > fabs(temp['43']):
+                    skirting_height = temp['43']
             wall_height = temp['43'] - tiling_height - skirting_height
             outstr = f'<a-plane id="wall-{x}-{side}" \n'
             outstr += f'position="0 {wall_height/2+tiling_height+skirting_height} 0" \n'
