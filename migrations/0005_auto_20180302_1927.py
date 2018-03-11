@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ('wagtailcore', '0040_page_draft_title'),
         ('wagtailforms', '0003_capitalizeverbose'),
-        ('demo', '0007_auto_20170830_2150'),
+        #('demo', '0007_auto_20170830_2150'),
         ('wagtailsearchpromotions', '0002_capitalizeverbose'),
         ('wagtailredirects', '0005_capitalizeverbose'),
         ('pymba', '0004_pymbapartitionpage_pymbapartitionpagelayers'),

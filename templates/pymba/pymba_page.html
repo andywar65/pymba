@@ -31,10 +31,10 @@
 			   {% endif %}
 			  {% endfor %}
 
-			  {% for wall in page.get_wall_children %}
-			   {% if wall.specific.image %}
-			    {% image wall.specific.image original as temp_image %}
-			     <img id="image-wall-{{ wall }}" 
+			  {% for part in page.get_partition_children %}
+			   {% if part.specific.image %}
+			    {% image part.specific.image original as temp_image %}
+			     <img id="image-partition-{{ part }}" 
 			     src="{{ temp_image.url }}">
 			   {% endif %}
 			  {% endfor %}
