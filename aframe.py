@@ -10,10 +10,14 @@ def parse_dxf(dxf_f, material_gallery):
     while value !='ENTITIES':
         key = dxf_f.readline().strip()
         value = dxf_f.readline().strip()
+        if value=='EOF' or key=='':#security to avoid loops if file is corrupted
+            return output
 
     while value !='ENDSEC':
         key = dxf_f.readline().strip()
         value = dxf_f.readline().strip()
+        if value=='EOF' or key=='':#security to avoid loops if file is corrupted
+            return output
 
         if flag == 'face':#stores values for 3D faces
             if key == '8':#layer name
@@ -605,9 +609,9 @@ def make_wall(x, data, partitions, finishings, csv_f):
 
 def make_wall_finishing(x, data, finishings, width, side, csv_f):
     try:
-        wall_finishing = finishings.get(title = data[side])
-        tiling_height = fabs(float(wall_finishing.tiling_height))/100*data['43']/fabs(data['43'])
-        skirting_height = fabs(float(wall_finishing.skirting_height))/100*data['43']/fabs(data['43'])
+        finishing = finishings.get(title = data[side])
+        tiling_height = fabs(float(finishing.tiling_height))/100*data['43']/fabs(data['43'])
+        skirting_height = fabs(float(finishing.skirting_height))/100*data['43']/fabs(data['43'])
         if tiling_height:
             if fabs(tiling_height) > fabs(data['43']):
                 tiling_height = data['43']
@@ -621,24 +625,24 @@ def make_wall_finishing(x, data, finishings, width, side, csv_f):
         outstr = f'<a-plane id="wall-{x}-{side}" \n'
         outstr += f'position="0 {wall_height/2+tiling_height+skirting_height} 0" \n'
         outstr += f'width="{fabs(width)}" height="{fabs(wall_height)}" \n'
-        outstr += f'material="src: #image-finishing-{wall_finishing.title}; color: {wall_finishing.color}'
-        outstr += is_repeat(wall_finishing.pattern, width, wall_height)
+        outstr += f'material="src: #image-finishing-{finishing.title}; color: {finishing.color}'
+        outstr += is_repeat(finishing.pattern, width, wall_height)
         outstr += '">\n</a-plane> \n'
-        csv_f.write(f'{x},{data["layer"]},a-wall/{side},{wall_finishing.title},Wall,-,-,-,-,-,-,{width},-,{wall_height},-,- \n')
+        csv_f.write(f'{x},{data["layer"]},a-wall/{side},{finishing.title},Wall,-,-,-,-,-,-,{width},-,{wall_height},-,- \n')
         outstr += f'<a-plane id="wall-{x}-{side}-tiling" \n'
         outstr += f'position="0 {tiling_height/2+skirting_height} 0" \n'
         outstr += f'width="{fabs(width)}" height="{fabs(tiling_height)}" \n'
-        outstr += f'material="src: #image-tiling-{wall_finishing.title}; color: {wall_finishing.tiling_color}'
-        outstr += is_repeat(wall_finishing.tiling_pattern, width, tiling_height)
+        outstr += f'material="src: #image-tiling-{finishing.title}; color: {finishing.tiling_color}'
+        outstr += is_repeat(finishing.tiling_pattern, width, tiling_height)
         outstr += '">\n</a-plane> \n'
-        csv_f.write(f'{x},{data["layer"]},a-wall/{side},{wall_finishing.title},Tiling,-,-,-,-,-,-,{width},-,{tiling_height},-,- \n')
+        csv_f.write(f'{x},{data["layer"]},a-wall/{side},{finishing.title},Tiling,-,-,-,-,-,-,{width},-,{tiling_height},-,- \n')
         outstr += f'<a-plane id="wall-{x}-{side}-skirting" \n'
         outstr += f'position="0 {skirting_height/2} 0" \n'
         outstr += f'width="{fabs(width)}" height="{fabs(skirting_height)}" \n'
-        outstr += f'material="src: #image-skirting-{wall_finishing.title}; color: {wall_finishing.skirting_color}'
-        outstr += is_repeat(wall_finishing.skirting_pattern, width, skirting_height)
+        outstr += f'material="src: #image-skirting-{finishing.title}; color: {finishing.skirting_color}'
+        outstr += is_repeat(finishing.skirting_pattern, width, skirting_height)
         outstr += '">\n</a-plane> \n'
-        csv_f.write(f'{x},{data["layer"]},a-wall/{side},{wall_finishing.title},Skirting,-,-,-,-,-,-,{width},-,{skirting_height},-,- \n')
+        csv_f.write(f'{x},{data["layer"]},a-wall/{side},{finishing.title},Skirting,-,-,-,-,-,-,{width},-,{skirting_height},-,- \n')
     except:
         outstr = f'<a-plane id="wall-{x}-{side}" \n'
         outstr += f'position="0 {data["43"]/2} 0" \n'
@@ -768,10 +772,10 @@ def make_slab_finishing(x, data, finishings, side, csv_f):
     outstr = f'<a-plane id="slab-{x}-{side}" \n'
     outstr += f'width="{fabs(data["41"])}" height="{fabs(data["42"])}" \n'
     try:
-        slab_finishing = finishings.get(title = data[side])
-        outstr += f'material="src: #image-finishing-{slab_finishing.title}; color: {slab_finishing.color}'
-        outstr += is_repeat(slab_finishing.pattern, data["41"], data["42"])
-        csv_f.write(f'{x},{data["layer"]},a-slab/{side},{slab_finishing.title},-,-,-,-,-,-,-,{data["41"]},{data["42"]},-,-,- \n')
+        finishing = finishings.get(title = data[side])
+        outstr += f'material="src: #image-finishing-{finishing.title}; color: {finishing.color}'
+        outstr += is_repeat(finishing.pattern, data["41"], data["42"])
+        csv_f.write(f'{x},{data["layer"]},a-slab/{side},{finishing.title},-,-,-,-,-,-,-,{data["41"]},{data["42"]},-,-,- \n')
     except:
         outstr += f'material="src: #image-{data["8"]}; color: {data["color"]}'
         outstr += is_repeat(data["repeat"], data["41"], data["42"])
