@@ -610,6 +610,7 @@ def make_wall(x, data, partitions, finishings, csv_f):
 def make_wall_finishing(x, data, finishings, width, side, csv_f):
     try:
         finishing = finishings.get(title = data[side])
+		
         tiling_height = fabs(float(finishing.tiling_height))/100*data['43']/fabs(data['43'])
         skirting_height = fabs(float(finishing.skirting_height))/100*data['43']/fabs(data['43'])
         if tiling_height:
@@ -622,13 +623,21 @@ def make_wall_finishing(x, data, finishings, width, side, csv_f):
             if fabs(skirting_height) > fabs(data['43']):
                 skirting_height = data['43']
         wall_height = data['43'] - tiling_height - skirting_height
+
+        if finishing.image:
+            wall_image = 'finishing-' + finishing.title
+            wall_repeat = finishing.pattern
+        else:
+            wall_image = data['8']
+            wall_repeat = data['repeat']
+
         outstr = f'<a-plane id="wall-{x}-{side}" \n'
         outstr += f'position="0 {wall_height/2+tiling_height+skirting_height} 0" \n'
         outstr += f'width="{fabs(width)}" height="{fabs(wall_height)}" \n'
-        outstr += f'material="src: #image-finishing-{finishing.title}; color: {finishing.color}'
-        outstr += is_repeat(finishing.pattern, width, wall_height)
+        outstr += f'material="src: #image-{wall_image}; color: {finishing.color}'
+        outstr += is_repeat(wall_repeat, width, wall_height)
         outstr += '">\n</a-plane> \n'
-        csv_f.write(f'{x},{data["layer"]},a-wall/{side},{finishing.title},Wall,-,-,-,-,-,-,{width},-,{wall_height},-,- \n')
+        csv_f.write(f'{x},{data["layer"]},a-wall/{side},{wall_image},Wall,-,-,-,-,-,-,{width},-,{wall_height},-,- \n')
         outstr += f'<a-plane id="wall-{x}-{side}-tiling" \n'
         outstr += f'position="0 {tiling_height/2+skirting_height} 0" \n'
         outstr += f'width="{fabs(width)}" height="{fabs(tiling_height)}" \n'
@@ -773,9 +782,15 @@ def make_slab_finishing(x, data, finishings, side, csv_f):
     outstr += f'width="{fabs(data["41"])}" height="{fabs(data["42"])}" \n'
     try:
         finishing = finishings.get(title = data[side])
-        outstr += f'material="src: #image-finishing-{finishing.title}; color: {finishing.color}'
-        outstr += is_repeat(finishing.pattern, data["41"], data["42"])
-        csv_f.write(f'{x},{data["layer"]},a-slab/{side},{finishing.title},-,-,-,-,-,-,-,{data["41"]},{data["42"]},-,-,- \n')
+        if finishing.image:
+            slab_image = 'finishing-' + finishing.title
+            slab_repeat = finishing.pattern
+        else:
+            slab_image = data['8']
+            slab_repeat = data['repeat']
+        outstr += f'material="src: #image-{slab_image}; color: {finishing.color}'
+        outstr += is_repeat(slab_repeat, data["41"], data["42"])
+        csv_f.write(f'{x},{data["layer"]},a-slab/{side},{slab_image},-,-,-,-,-,-,-,{data["41"]},{data["42"]},-,-,- \n')
     except:
         outstr += f'material="src: #image-{data["8"]}; color: {data["color"]}'
         outstr += is_repeat(data["repeat"], data["41"], data["42"])
