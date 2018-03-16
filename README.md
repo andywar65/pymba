@@ -36,6 +36,17 @@ Text standard block is a text centered in a bounding plane. The attributes contr
 
 Link standard block allows you to link different pages on a click. The `Tree` attribute lets you select among parent, previous, next and first child page. If target has an equirectangular image (see backend paragraph) it will appear in the link.
 
+### BIM standard blocks
+
+BIM standard blocks are recognized as real life building elements. By now we have only `Wall` and `Slab` BIM elements. They behave pretty much as a box, but attributes are different: we can set a `Type` for each wall/slab and a `Finishing` for each side.
+
+Wall and Slab types are defined in the backend as `PYMba Pertition Pages`, and must be children of the `Pymba Page` they are related to. Creating a new partition type requires `Title`, `Intro`, `Image` (is it a `pattern`?) and `Color`. You can then add as many wall `Layers` to the Partition Type as you want. Layers require a `Material`, a `Thickness` (in centimeters) and a `Weight` in kilograms per cubic meter.
+First layer is innermost for Walls and uppermost for Slabs. The app controls if wall/slab dimensions in CAD are consistent with Partition Type features, i.e. wall/slab thickness. If inconsistency arises, wall/slab is rendered in flat red. You can leave a layer with zero thickness to assign the same Partition Type to blocks with different depth.
+
+Finishings are defined in the backend as `PYMba Finishing Pages`, and must be children of the `Pymba Page` they are related to. Creating a new finishing requires `Title`, `Intro`, `Image` (is it a `pattern`?) and `Color` for `General`, `Tiling` and `Skirting` appearance. Tiling and Skirting require also `height`, intended as their upper bound with respect to the floor. Slabs don't use settings for tiling and skirting.
+
+BIM element data is stored in a `CSV` file downloadable from the frontend. Data includes wall/slab weight and finishing surfaces.
+
 ### Wagtail backend
 
 Create a page of the `Pymba Page` kind. You will have to enter a Title and an Intro for the page, and an Equirectangular Image for the background (if none, a default one will be picked). Equirectangular images are like those planispheres where Greenland is bigger than Africa. In the Visual Settings panel you will have to check if you want your shadows on, if you want your camera to be able to fly and if 3D faces must be double sided.
@@ -48,17 +59,6 @@ Okay, now publish and go to the frontend to see how your model behaves.
 
 The model window is embedded within your website, but you can go fullscreen by pressing `F` or the visor icon in the right bottom corner of the window. On some mobiles the image will be split in two, with stereoscopic effect. You will need one of those cardboard headgears to appreciate the effect. Press `ESC` to exit fullscreen mode. On laptops, if you want to look around, you have to press and drag the mouse. To move around press the `W-A-S-D` keys. On some mobiles you literally walk to explore the model, but I've never experienced that. 
 Last but not least, press the `Ctrl+Alt+I` to enter the Inspector mode, that makes you inspect and modify the entities of the model. Modifications can be saved to HTML files.
-
-### BIM standard blocks
-
-BIM standard blocks are recognized as real life building elements. By now we have only `Wall` and `Slab` BIM elements. They behave pretty much as a box, but attributes are different: we can set a `Type` for each wall/slab and a `Finishing` for each side.
-
-Wall and Slab types are defined in the backend as `PYMba Pertition Pages`, and must be children of the `Pymba Page` they are related to. Creating a new partition type requires `Title`, `Intro`, `Image` (is it a `pattern`?) and `Color`. You can then add as many wall `Layers` to the Partition Type as you want. Layers require a `Material`, a `Thickness` (in centimeters) and a `Weight` in kilograms per cubic meter.
-First layer is innermost for Walls and uppermost for Slabs. The app controls if wall/slab dimensions in CAD are consistent with Partition Type features, i.e. wall/slab thickness. If inconsistency arises, wall/slab is rendered in flat red. You can leave a layer with zero thickness to assign the same Partition Type to blocks with different depth.
-
-Finishings are defined in the backend as `PYMba Finishing Pages`, and must be children of the `Pymba Page` they are related to. Creating a new finishing requires `Title`, `Intro`, `Image` (is it a `pattern`?) and `Color` for `General`, `Tiling` and `Skirting` appearance. Tiling and Skirting require also `height`, intended as their upper bound with respect to the floor. Slabs don't use settings for tiling and skirting.
-
-BIM element data is stored in a `CSV` file downloadable from the frontend. Data includes wall/slab weight and finishing surfaces.
 
 ### Next improvements
 

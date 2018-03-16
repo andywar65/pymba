@@ -514,10 +514,10 @@ def make_wall(x, data, partitions, finishings, csv_f):
             else:
                 if wall_type.image:
                     data['8'] = 'partition-' + wall_type.title
-                data['color'] = wall_type.color
-                data['repeat']=False
-                if wall_type.pattern:# == True
-                    data['repeat']=True
+                    data['repeat'] = wall_type.pattern
+                if wall_type.color:
+                    data['color'] = wall_type.color
+
         except:
             pass
     #writing to csv file
@@ -630,11 +630,15 @@ def make_wall_finishing(x, data, finishings, width, side, csv_f):
         else:
             wall_image = data['8']
             wall_repeat = data['repeat']
+        if finishing.color:
+            wall_color = finishing.color
+        else:
+            wall_color = data['color']
 
         outstr = f'<a-plane id="wall-{x}-{side}" \n'
         outstr += f'position="0 {wall_height/2+tiling_height+skirting_height} 0" \n'
         outstr += f'width="{fabs(width)}" height="{fabs(wall_height)}" \n'
-        outstr += f'material="src: #image-{wall_image}; color: {finishing.color}'
+        outstr += f'material="src: #image-{wall_image}; color: {wall_color}'
         outstr += is_repeat(wall_repeat, width, wall_height)
         outstr += '">\n</a-plane> \n'
         csv_f.write(f'{x},{data["layer"]},a-wall/{side},{wall_image},Wall,-,-,-,-,-,-,{width},-,{wall_height},-,- \n')
@@ -688,10 +692,10 @@ def make_slab(x, data, partitions, finishings, csv_f):
             else:
                 if slab_type.image:
                     data['8'] = 'partition-' + slab_type.title
-                data['color'] = slab_type.color
-                data['repeat']=False
-                if slab_type.pattern:# == True
-                    data['repeat']=True
+                    data['repeat']= slab_type.pattern
+                if slab_type.color:
+                    data['color'] = slab_type.color
+
         except:
             pass
     #writing to csv file
@@ -788,7 +792,12 @@ def make_slab_finishing(x, data, finishings, side, csv_f):
         else:
             slab_image = data['8']
             slab_repeat = data['repeat']
-        outstr += f'material="src: #image-{slab_image}; color: {finishing.color}'
+        if finishing.color:
+            slab_color = finishing.color
+        else:
+            slab_color = data['color']
+
+        outstr += f'material="src: #image-{slab_image}; color: {slab_color}'
         outstr += is_repeat(slab_repeat, data["41"], data["42"])
         csv_f.write(f'{x},{data["layer"]},a-slab/{side},{slab_image},-,-,-,-,-,-,-,{data["41"]},{data["42"]},-,-,- \n')
     except:
