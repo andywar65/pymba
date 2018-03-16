@@ -15,36 +15,39 @@ from wagtail.wagtaildocs.models import Document
 from wagtail.wagtaildocs.edit_handlers import DocumentChooserPanel
 
 class PymbaFinishingPage(Page):
-    intro = models.CharField(max_length=250, null=True, blank=True,)
+    intro = models.CharField(max_length=250, null=True, blank=True, help_text="Finishing description",)
     image = models.ForeignKey(
         'wagtailimages.Image', 
         null=True,
         blank=True,
         on_delete = models.SET_NULL, 
         related_name = '+',
+        help_text="Sets the finishing general appearance",
         )
-    pattern = models.BooleanField(default=False)
-    color = models.CharField(max_length=250, null=True, blank=True,)
-    tiling_height = models.CharField(max_length=250, default="0",)
+    pattern = models.BooleanField(default=False, help_text="Is it a 1x1 meter pattern?",)
+    color = models.CharField(max_length=250, null=True, blank=True, help_text="Accepts hex (#ffffff) or HTML color",)
+    tiling_height = models.CharField(max_length=250, default="0", help_text="Tiling height from floor in cm",)
     tiling_image = models.ForeignKey(
         'wagtailimages.Image', 
         null=True,
         blank=True,
         on_delete = models.SET_NULL, 
         related_name = '+',
+        help_text="Sets the tiling general appearance",
         )
-    tiling_pattern = models.BooleanField(default=False)
-    tiling_color = models.CharField(max_length=250, default="white",)
-    skirting_height = models.CharField(max_length=250, default="0",)
+    tiling_pattern = models.BooleanField(default=False,  help_text="Is it a 1x1 meter pattern?",)
+    tiling_color = models.CharField(max_length=250, default="white", help_text="Accepts hex (#ffffff) or HTML color",)
+    skirting_height = models.CharField(max_length=250, default="0", help_text="Skirting height from in cm",)
     skirting_image = models.ForeignKey(
         'wagtailimages.Image', 
         null=True,
         blank=True,
         on_delete = models.SET_NULL, 
         related_name = '+',
+        help_text="Sets the skirting general appearance",
         )
-    skirting_pattern = models.BooleanField(default=False)
-    skirting_color = models.CharField(max_length=250, default="white",)
+    skirting_pattern = models.BooleanField(default=False,  help_text="Is it a 1x1 meter pattern?",)
+    skirting_color = models.CharField(max_length=250, default="white", help_text="Accepts hex (#ffffff) or HTML color",)
 
     search_fields = Page.search_fields + [
         index.SearchField('intro'),
@@ -72,16 +75,17 @@ class PymbaFinishingPage(Page):
     ]
 
 class PymbaPartitionPage(Page):
-    intro = models.CharField(max_length=250, null=True, blank=True,)
+    intro = models.CharField(max_length=250, null=True, blank=True, help_text="Partition description",)
     image = models.ForeignKey(
         'wagtailimages.Image', 
         null=True,
         blank=True,
         on_delete = models.SET_NULL, 
         related_name = '+',
+        help_text="Sets the partition general appearance",
         )
-    pattern = models.BooleanField(default=False)
-    color = models.CharField(max_length=250, null=True, blank=True,)
+    pattern = models.BooleanField(default=False,  help_text="Is it a 1x1 meter pattern?",)
+    color = models.CharField(max_length=250, null=True, blank=True, help_text="Accepts hex (#ffffff) or HTML color",)
 
     search_fields = Page.search_fields + [
         index.SearchField('intro'),
@@ -99,9 +103,9 @@ class PymbaPartitionPage(Page):
 
 class PymbaPartitionPageLayers(Orderable):
     page = ParentalKey(PymbaPartitionPage, related_name='part_layers')
-    material = models.CharField(max_length=250, default="brick",)
-    thickness = models.CharField(max_length=250, default="0",)
-    weight = models.CharField(max_length=250, default="0",)
+    material = models.CharField(max_length=250, default="brick", help_text="Material description",)
+    thickness = models.CharField(max_length=250, default="0", help_text="In centimeters",)
+    weight = models.CharField(max_length=250, default="0", help_text="In kilos per cubic meter",)
 
     panels = [
         FieldPanel('material'),
@@ -110,23 +114,25 @@ class PymbaPartitionPageLayers(Orderable):
     ]
 
 class PymbaPage(Page):
-    intro = models.CharField(max_length=250, null=True, blank=True,)
+    intro = models.CharField(max_length=250, null=True, blank=True, help_text="Project description",)
     equirectangular_image = models.ForeignKey(
         'wagtailimages.Image', 
         null=True,
         blank=True,
         on_delete = models.SET_NULL, 
         related_name = '+',
+        help_text="Landscape surrounding your project",
         )
     dxf_file = models.ForeignKey(
         'wagtaildocs.Document', 
         null=True, 
         on_delete = models.SET_NULL,
         related_name = '+',
+        help_text="CAD file of your project",
         )
-    shadows = models.BooleanField(default=False)
-    fly_camera = models.BooleanField(default=False)
-    double_face = models.BooleanField(default=False)
+    shadows = models.BooleanField(default=False, help_text="Want to cast shadows?",)
+    fly_camera = models.BooleanField(default=False, help_text="Vertical movement of camera?",)
+    double_face = models.BooleanField(default=False, help_text="Planes are visible on both sides?",)
 
     search_fields = Page.search_fields + [
         index.SearchField('intro'),
@@ -183,10 +189,11 @@ class PymbaPageMaterialImage(Orderable):
         blank=True,
         on_delete = models.SET_NULL, 
         related_name = '+',
+        help_text="Sets general appearance of material",
     )
-    layer = models.CharField(max_length=250, default="0",)
-    color = models.CharField(max_length=250, default="white",)
-    pattern = models.BooleanField(default=False)
+    layer = models.CharField(max_length=250, default="0", help_text="Layer name in CAD file",)
+    color = models.CharField(max_length=250, default="white", help_text="Accepts hex (#ffffff) or HTML color",)
+    pattern = models.BooleanField(default=False, help_text="Is it a 1x1 meter pattern?",)
 
     panels = [
         FieldPanel('layer'),
