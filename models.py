@@ -24,7 +24,7 @@ class PymbaFinishingPage(Page):
         related_name = '+',
         )
     pattern = models.BooleanField(default=False)
-    color = models.CharField(max_length=250, default="white",)
+    color = models.CharField(max_length=250, null=True, blank=True,)
     tiling_height = models.CharField(max_length=250, default="0",)
     tiling_image = models.ForeignKey(
         'wagtailimages.Image', 
@@ -81,7 +81,7 @@ class PymbaPartitionPage(Page):
         related_name = '+',
         )
     pattern = models.BooleanField(default=False)
-    color = models.CharField(max_length=250, default="white",)
+    color = models.CharField(max_length=250, null=True, blank=True,)
 
     search_fields = Page.search_fields + [
         index.SearchField('intro'),
