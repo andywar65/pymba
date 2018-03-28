@@ -132,7 +132,7 @@ def parse_dxf(dxf_f, material_gallery):
                 except:
                     data['8'] = 'default'
                     data['color'] = 'white'
-
+                data['num'] = x
                 output[x] = data
 
                 if data['12']!=data['13'] or data['22']!=data['23'] or data['32']!=data['33']:
@@ -144,6 +144,7 @@ def parse_dxf(dxf_f, material_gallery):
                     data2['22'] = data['23']
                     data2['32'] = data['33']
                     x += 1
+                    data2['num'] = x
                     output[x] = data2
 
                 flag = False
@@ -162,6 +163,7 @@ def parse_dxf(dxf_f, material_gallery):
                 except:
                     data['8'] = 'default'
                     data['color'] = 'white'
+                data['num'] = x
                 output[x] = data
 
                 flag = False
@@ -224,7 +226,7 @@ def make_html(self_page, collection, partitions, finishings, csv_f):
         elif data['2'] == 'a-link':
             output[x] = make_link(self_page, x, data)
 
-        elif data['2'] == 'a-wall':
+        elif data['2'] == 'a-wall' or data['2'] == 'a-door' or data['2'] == 'a-openwall':
             output[x] = make_wall(x, data, partitions, finishings, csv_f)
 
         elif data['2'] == 'a-slab':
@@ -232,9 +234,100 @@ def make_html(self_page, collection, partitions, finishings, csv_f):
 
     return output
 
+def reference_openings(collection):
+    collection2 = collection.copy()
+    for x, data in collection.items():
+        if data['2'] == 'a-door':
+            data['foo'] = 'door'
+            collection[x] = data
+            for x2, data2 in collection2.items():
+                if data2['2'] == 'a-wall':
+                    data2['foo'] = 'wall'
+                    if data['210']==0 and data['220']==0 and data2['210']==0 and data2['220']==0:
+                        data2 = door_straight_case(x, data, data2)
+                    else:
+                        data2 = door_tilted_case(x, data, data2)
+                    collection[x2] = data2
+
+    return collection
+
+def door_straight_case(x, data, data2):
+    if data['30']==data2['30'] and data['43']>0 and data2['43']>0:
+        rotd = round(data['50'], 0)
+        rotw = round(data2['50'], 0)
+        if rotd==rotw-180 or rotd-180==rotw:
+            backwards = -1
+        else:
+            backwards = 1
+        if rotd == rotw or backwards == -1:
+            #translation
+            xt = data['10']-data2['10']
+            zt = data['20']-data2['20']
+            #rotation
+            alfa = radians(data2['50'])
+            xd = round(xt*cos(alfa)-zt*sin(alfa), 4)
+            zd = round(xt*sin(alfa)+zt*cos(alfa), 4)
+            xde = xd + round(data['41'], 4)*backwards
+            zde = zd + round(data['42'], 4)
+            #wall bounding box
+            if data2['41'] > 0:
+                xmaxw = round(data2['41'], 4)
+                xminw = 0
+            else:
+                xmaxw = 0
+                xminw = round(data2['41'], 4)
+            if data2['42'] > 0:
+                zmaxw = 0
+                zminw = -round(data2['42'], 4)
+            else:
+                zmaxw = -round(data2['42'], 4)
+                zminw = 0
+            #door bounding box
+            if xde > xd:
+                xmaxd = xde
+                xmind = xd
+            else:
+                xmaxd = xd
+                xmind = xde
+            if zde > zd:
+                zmaxd = zde
+                zmind = zd
+            else:
+                zmaxd = zd
+                zmind = zde
+            #door inclusion
+            data2['foo'] = f'wall, zmaxw={zmaxw}, zmaxd={zmaxd}, zminw={zminw}, zmind={zmind}'
+            if xmaxw >= xmaxd and xminw <= xmind and zmaxw >= zmaxd and zminw <= zmind:
+                data2['door'] = x
+                data2['foo'] = 'openwall'
+                data2['2'] = 'a-openwall'
+                if data['43']>data2['43']:
+                    data2['door_height'] = data2['43']
+                else:
+                    data2['door_height'] = data['43']
+                if data2['41']>0:
+                    data2['door_off_1'] = xmind
+                    data2['door_off_2'] = xmaxd
+                else:
+                    data2['door_off_1'] = xmaxd - xmaxw
+                    data2['door_off_2'] = xmind - xmaxw
+
+    return data2
+
+#TODO
+def door_tilted_case(x, data, data2):
+    data2['foo'] = 'wall'
+    #d210 = round(data['210']*fabs(data['41'])/data['41'], 4)
+    #d220 = round(data['220']*fabs(data['42'])/data['42'], 4)
+    #d50 = round(data['50']*fabs(data['43'])/data['43'], 4)
+    #w210 = round(data2['210']*fabs(data2['41'])/data2['41'], 4)
+    #w220 = round(data2['220']*fabs(data2['42'])/data2['42'], 4)
+    #w50 = round(data2['50']*fabs(data2['43'])/data2['43'], 4)
+    return data2
+
 def is_repeat(repeat, rx, ry):
     if repeat:
-        output = f'; repeat:{fabs(float(rx))} {fabs(float(ry))}'
+        output = f'; repeat:{fabs(rx)} {fabs(ry)}'
         return output
     else:
         return ';'
@@ -597,6 +690,7 @@ def make_wall(x, data, partitions, finishings, csv_f):
         outstr += make_wall_finishing(x, data, finishings, width, side, csv_f)
         outstr += '</a-entity> \n'
         outstr += '</a-entity>\n'
+        outstr += f'<p>{data["foo"]}</p>'
 
     else:#there is an alert, the wall gets painted red
         outstr += f'<a-box id="wall-{x}-alert" \n'

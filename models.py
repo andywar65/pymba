@@ -166,6 +166,8 @@ class PymbaPage(Page):
         collection = aframe.parse_dxf(dxf_f, material_gallery)
         dxf_f.close()
 
+        collection = aframe.reference_openings(collection)
+
         path_to_csv = os.path.join(settings.MEDIA_ROOT, 'documents', self.slug + '.csv')
         csv_f = open(path_to_csv, 'w', encoding = 'utf-8',)
         csv_f.write('Num,Layer,Block/Side,Type,Finishing,X,Y,Z,Rx,Ry,Rz,Width,Depth,Height,Weight, Alert \n')
