@@ -700,8 +700,19 @@ def make_wall(x, data, partitions, finishings, csv_f):
 
 def make_wall_finishing(x, data, finishings, width, side, csv_f):
     try:
-        finishing = finishings.get(title = data[side])
-		
+        if side=='in-left' or side=='in-right' or side=='in-top':
+            data_side = data['in']
+        elif side=='out-left' or side=='out-right' or side=='out-top':
+            data_side = data['out']
+        else:
+            data_side = data[side]
+        finishing = finishings.get(title = data_side)
+
+        if data['2']=='a-openwall':
+            door_height = fabs(data['door_height'])*data['43']/fabs(data['43'])
+        else:
+            door_height = 0
+
         tiling_height = fabs(float(finishing.tiling_height))/100*data['43']/fabs(data['43'])
         skirting_height = fabs(float(finishing.skirting_height))/100*data['43']/fabs(data['43'])
         if tiling_height:
@@ -935,13 +946,13 @@ def make_openwall(x, data, partitions, finishings, csv_f):
     #writing to csv file
     csv_f.write(f'{x},{data["layer"]},{data["2"]},{data["type"]},-,{data["10"]},{-data["20"]},{data["30"]},')
     csv_f.write(f'{data["210"]},{-data["220"]},{data["50"]},{data["41"]},{data["42"]},{data["43"]},{wall_weight},{data["alert"]} \n')
-    #start wall entity
-    outstr = f'<a-entity id="wall-{x}-ent" \n'
+    #start openwall entity
+    outstr = f'<a-entity id="openwall-{x}-ent" \n'
     outstr += f'position="{data["10"]} {data["30"]} {data["20"]}" \n'
     outstr += f'rotation="{data["210"]} {data["50"]} {data["220"]}">\n'
     if data['alert'] == 'None':#we have 6 planes, not a box
-        #wall top
-        outstr += f'<a-plane id="wall-{x}-top" \n'
+        #openwall top
+        outstr += f'<a-plane id="openwall-{x}-top" \n'
         outstr += f'position="{data["41"]/2} {data["43"]} {-data["42"]/2}" \n'
         if data['43'] < 0:
             outstr += f'rotation="90 0 0" \n'
@@ -951,8 +962,8 @@ def make_openwall(x, data, partitions, finishings, csv_f):
         outstr += f'material="src: #image-{data["8"]}; color: {data["color"]}'
         outstr += is_repeat(data["repeat"], data["41"], data["42"])
         outstr += '">\n</a-plane> \n'
-        #wall bottom
-        outstr += f'<a-plane id="wall-{x}-bottom" \n'
+        #openwall bottom
+        outstr += f'<a-plane id="openwall-{x}-bottom" \n'
         outstr += f'position="{data["41"]/2} 0 {-data["42"]/2}" \n'
         if data['43'] < 0:
             outstr += f'rotation="-90 0 0" \n'
@@ -963,31 +974,56 @@ def make_openwall(x, data, partitions, finishings, csv_f):
         outstr += is_repeat(data["repeat"], data["41"], data["42"])
         outstr += '">\n</a-plane> \n'
 
-        #wall inside
-        outstr += f'<a-entity id="wall-{x}-in-ent" \n'
-        outstr += f'position="{data["41"]/2} 0 0" \n'
+        #openwall inside left
+        outstr += f'<a-entity id="openwall-{x}-in-left-ent" \n'
+        outstr += f'position="{data["door_off_1"]/2} 0 0" \n'
         if data['42'] < 0:
             outstr += 'rotation="0 180 0"> \n'
         else:
             outstr += '> \n'
-        side = 'in'
-        width = data['41']
+        side = 'in-left'
+        width = data['door_off_1']
         outstr += make_wall_finishing(x, data, finishings, width, side, csv_f)
         outstr += '</a-entity> \n'
 
-        #wall outside
-        outstr += f'<a-entity id="wall-{x}-out-ent" \n'
-        outstr += f'position="{data["41"]/2} 0 {-data["42"]}" \n'
+        #openwall inside right
+        outstr += f'<a-entity id="openwall-{x}-in-right-ent" \n'
+        outstr += f'position="{(data["41"]-data["door_off_2"])/2+data["door_off_2"]} 0 0" \n'
+        if data['42'] < 0:
+            outstr += 'rotation="0 180 0"> \n'
+        else:
+            outstr += '> \n'
+        side = 'in-right'
+        width = data["41"]-data["door_off_2"]
+        outstr += make_wall_finishing(x, data, finishings, width, side, csv_f)
+        outstr += '</a-entity> \n'
+
+        #openwall outside left
+        outstr += f'<a-entity id="openwall-{x}-out-left-ent" \n'
+        outstr += f'position="{data["door_off_1"]/2} 0 {-data["42"]}" \n'
         if data['42'] > 0:
             outstr += 'rotation="0 180 0"> \n'
         else:
             outstr += '> \n'
-        side = 'out'
+        side = 'out-left'
+        width = data['door_off_1']
         outstr += make_wall_finishing(x, data, finishings, width, side, csv_f)
         outstr += '</a-entity> \n'
 
-        #wall left
-        outstr += f'<a-entity id="wall-{x}-left-ent" \n'
+        #openwall outside right
+        outstr += f'<a-entity id="openwall-{x}-out-right-ent" \n'
+        outstr += f'position="{(data["41"]-data["door_off_2"])/2+data["door_off_2"]} 0 {-data["42"]}" \n'
+        if data['42'] > 0:
+            outstr += 'rotation="0 180 0"> \n'
+        else:
+            outstr += '> \n'
+        side = 'out-right'
+        width = data["41"]-data["door_off_2"]
+        outstr += make_wall_finishing(x, data, finishings, width, side, csv_f)
+        outstr += '</a-entity> \n'
+
+        #openwall left
+        outstr += f'<a-entity id="openwall-{x}-left-ent" \n'
         outstr += f'position="0 0 {-data["42"]/2}" \n'
         if data['41'] > 0:
             outstr += 'rotation="0 -90 0"> \n'
@@ -998,8 +1034,8 @@ def make_openwall(x, data, partitions, finishings, csv_f):
         outstr += make_wall_finishing(x, data, finishings, width, side, csv_f)
         outstr += '</a-entity> \n'
 
-        #wall right
-        outstr += f'<a-entity id="wall-{x}-right-ent" \n'
+        #openwall right
+        outstr += f'<a-entity id="openwall-{x}-right-ent" \n'
         outstr += f'position="{data["41"]} 0 {-data["42"]/2}" \n'
         if data['41'] > 0:
             outstr += 'rotation="0 90 0"> \n'
@@ -1010,8 +1046,8 @@ def make_openwall(x, data, partitions, finishings, csv_f):
         outstr += '</a-entity> \n'
         outstr += '</a-entity>\n'
 
-    else:#there is an alert, the wall gets painted red
-        outstr += f'<a-box id="wall-{x}-alert" \n'
+    else:#there is an alert, the wall gets painted red, TODO hole for door
+        outstr += f'<a-box id="openwall-{x}-alert" \n'
         outstr += f'position="{data["41"]/2} {data["43"]/2} {-data["42"]/2}" \n'
         outstr += f'scale="{fabs(data["41"])} {fabs(data["43"])} {fabs(data["42"])}" \n'
         outstr += 'material="color: red;'
