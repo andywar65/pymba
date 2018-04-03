@@ -699,6 +699,11 @@ def make_wall(x, data, partitions, finishings, csv_f):
     return outstr
 
 def make_wall_finishing(x, data, finishings, width, side, csv_f):
+    if data['2']=='a-openwall' and (side=='in-top' or side=='out-top'):
+        door_height = fabs(data['door_height'])*data['43']/fabs(data['43'])
+    else:
+        door_height = 0
+
     try:
         if side=='in-left' or side=='in-right' or side=='in-top':
             data_side = data['in']
@@ -708,23 +713,19 @@ def make_wall_finishing(x, data, finishings, width, side, csv_f):
             data_side = data[side]
         finishing = finishings.get(title = data_side)
 
-        if data['2']=='a-openwall':
-            door_height = fabs(data['door_height'])*data['43']/fabs(data['43'])
-        else:
-            door_height = 0
-
         tiling_height = fabs(float(finishing.tiling_height))/100*data['43']/fabs(data['43'])
         skirting_height = fabs(float(finishing.skirting_height))/100*data['43']/fabs(data['43'])
-        if tiling_height:
-            if fabs(tiling_height) > fabs(data['43']):
-                tiling_height = data['43']
-            if fabs(skirting_height) > fabs(tiling_height):
-                skirting_height = tiling_height
-            tiling_height = tiling_height - skirting_height
-        elif skirting_height:
-            if fabs(skirting_height) > fabs(data['43']):
-                skirting_height = data['43']
-        wall_height = data['43'] - tiling_height - skirting_height
+        if fabs(door_height) > fabs(data['43']):
+            door_height = data['43']
+        if fabs(skirting_height) < fabs(door_height):
+            skirting_height = door_height
+        if fabs(tiling_height) < fabs(skirting_height):
+            tiling_height = skirting_height
+        if fabs(tiling_height) < fabs(door_height):
+            tiling_height = door_height
+        wall_height = data['43'] - tiling_height
+        tiling_height = tiling_height - skirting_height
+        skirting_height = skirting_height - door_height
 
         if finishing.image:
             wall_image = 'finishing-' + finishing.title
@@ -760,10 +761,10 @@ def make_wall_finishing(x, data, finishings, width, side, csv_f):
         csv_f.write(f'{x},{data["layer"]},a-wall/{side},{finishing.title},Skirting,-,-,-,-,-,-,{width},-,{skirting_height},-,- \n')
     except:
         outstr = f'<a-plane id="wall-{x}-{side}" \n'
-        outstr += f'position="0 {data["43"]/2} 0" \n'
-        outstr += f'width="{fabs(width)}" height="{fabs(data["43"])}" \n'
+        outstr += f'position="0 {(data["43"]-door_height)/2} 0" \n'
+        outstr += f'width="{fabs(width)}" height="{fabs(data["43"]-door_height)}" \n'
         outstr += f'material="src: #image-{data["8"]}; color: {data["color"]}'
-        outstr += is_repeat(data["repeat"], width, data["43"])
+        outstr += is_repeat(data["repeat"], width, data["43"]-door_height)
         outstr += '">\n</a-plane> \n'
     return outstr
 
@@ -962,16 +963,28 @@ def make_openwall(x, data, partitions, finishings, csv_f):
         outstr += f'material="src: #image-{data["8"]}; color: {data["color"]}'
         outstr += is_repeat(data["repeat"], data["41"], data["42"])
         outstr += '">\n</a-plane> \n'
-        #openwall bottom
-        outstr += f'<a-plane id="openwall-{x}-bottom" \n'
-        outstr += f'position="{data["41"]/2} 0 {-data["42"]/2}" \n'
+        #openwall bottom left
+        outstr += f'<a-plane id="openwall-{x}-bottom-left" \n'
+        outstr += f'position="{data["door_off_1"]/2} 0 {-data["42"]/2}" \n'
         if data['43'] < 0:
             outstr += f'rotation="-90 0 0" \n'
         else:
             outstr += f'rotation="90 0 0" \n'
-        outstr += f'width="{fabs(data["41"])}" height="{fabs(data["42"])}" \n'
+        outstr += f'width="{fabs(data["door_off_1"])}" height="{fabs(data["42"])}" \n'
         outstr += f'material="src: #image-{data["8"]}; color: {data["color"]}'
-        outstr += is_repeat(data["repeat"], data["41"], data["42"])
+        outstr += is_repeat(data["repeat"], data["door_off_1"], data["42"])
+        outstr += '">\n</a-plane> \n'
+        #openwall bottom right
+        outstr += f'<a-plane id="openwall-{x}-bottom-right" \n'
+        width = data["41"]-data["door_off_2"]
+        outstr += f'position="{width/2+data["door_off_2"]} 0 {-data["42"]/2}" \n'
+        if data['43'] < 0:
+            outstr += f'rotation="-90 0 0" \n'
+        else:
+            outstr += f'rotation="90 0 0" \n'
+        outstr += f'width="{fabs(width)}" height="{fabs(data["42"])}" \n'
+        outstr += f'material="src: #image-{data["8"]}; color: {data["color"]}'
+        outstr += is_repeat(data["repeat"], width, data["42"])
         outstr += '">\n</a-plane> \n'
 
         #openwall inside left
@@ -998,6 +1011,18 @@ def make_openwall(x, data, partitions, finishings, csv_f):
         outstr += make_wall_finishing(x, data, finishings, width, side, csv_f)
         outstr += '</a-entity> \n'
 
+        #openwall inside top
+        outstr += f'<a-entity id="openwall-{x}-in-top-ent" \n'
+        outstr += f'position="{(data["door_off_2"]-data["door_off_1"])/2+data["door_off_1"]} {data["door_height"]} 0" \n'
+        if data['42'] < 0:
+            outstr += 'rotation="0 180 0"> \n'
+        else:
+            outstr += '> \n'
+        side = 'in-top'
+        width = data["door_off_2"]-data["door_off_1"]
+        outstr += make_wall_finishing(x, data, finishings, width, side, csv_f)
+        outstr += '</a-entity> \n'
+
         #openwall outside left
         outstr += f'<a-entity id="openwall-{x}-out-left-ent" \n'
         outstr += f'position="{data["door_off_1"]/2} 0 {-data["42"]}" \n'
@@ -1019,6 +1044,18 @@ def make_openwall(x, data, partitions, finishings, csv_f):
             outstr += '> \n'
         side = 'out-right'
         width = data["41"]-data["door_off_2"]
+        outstr += make_wall_finishing(x, data, finishings, width, side, csv_f)
+        outstr += '</a-entity> \n'
+		
+        #openwall outside top
+        outstr += f'<a-entity id="openwall-{x}-out-top-ent" \n'
+        outstr += f'position="{(data["door_off_2"]-data["door_off_1"])/2+data["door_off_1"]} {data["door_height"]} {-data["42"]}" \n'
+        if data['42'] > 0:
+            outstr += 'rotation="0 180 0"> \n'
+        else:
+            outstr += '> \n'
+        side = 'out-top'
+        width = data["door_off_2"]-data["door_off_1"]
         outstr += make_wall_finishing(x, data, finishings, width, side, csv_f)
         outstr += '</a-entity> \n'
 
