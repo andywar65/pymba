@@ -226,7 +226,7 @@ def make_html(self_page, collection, partitions, finishings, csv_f):
         elif data['2'] == 'a-link':
             output[x] = make_link(self_page, x, data)
 
-        elif data['2'] == 'a-wall' or data['2'] == 'a-door':
+        elif data['2'] == 'a-wall':
             output[x] = make_wall(x, data, partitions, finishings, csv_f)
 
         elif data['2'] == 'a-openwall':
@@ -234,6 +234,12 @@ def make_html(self_page, collection, partitions, finishings, csv_f):
 
         elif data['2'] == 'a-slab':
             output[x] = make_slab(x, data, partitions, finishings, csv_f)
+
+        elif data['2'] == 'a-door':
+            part = APartition(data, partitions, finishings, csv_f)
+            if part.type_obj:
+                weight = part.calc_weight()
+            output[x] = part.write_html()
 
     return output
 
@@ -1046,7 +1052,7 @@ def make_openwall(x, data, partitions, finishings, csv_f):
         width = data["41"]-data["door_off_2"]
         outstr += make_wall_finishing(x, data, finishings, width, side, csv_f)
         outstr += '</a-entity> \n'
-		
+
         #openwall outside top
         outstr += f'<a-entity id="openwall-{x}-out-top-ent" \n'
         outstr += f'position="{(data["door_off_2"]-data["door_off_1"])/2+data["door_off_1"]} {data["door_height"]} {-data["42"]}" \n'
@@ -1091,3 +1097,54 @@ def make_openwall(x, data, partitions, finishings, csv_f):
         outstr += '">\n</a-box>\n </a-entity>\n'
 
     return outstr
+
+class APartition(object):
+    def __init__(self, data, types, finishings, csv_f):
+        self.d = data
+        if self.d['type']:
+            try:
+                self.type_obj = types.get(title = self.d['type'])
+            except:
+                self.type_obj = False
+        self.finishings = finishings
+        self.csv_f = csv_f
+
+    def calc_weight(self):
+
+        self.d['alert'] = 'None'
+        part_weight = 0
+        unit_weight = 0
+        zero_weight = 0
+        part_thickness = 0
+        fixed_thickness = True
+
+        for part_layer in self.type_obj.part_layers.all():
+            part_layer_thickness = fabs(float(part_layer.thickness))
+            part_layer_weight = fabs(float(part_layer.weight))
+            if part_layer_thickness == 0:
+                fixed_thickness = False
+                zero_weight = part_layer_weight
+            part_thickness += part_layer_thickness
+            unit_weight += part_layer_thickness/100 * part_layer_weight
+        unit_weight += (fabs(self.d['42']) - part_thickness/100) * zero_weight#add eventual zero thickness layer
+        part_weight = unit_weight * fabs(self.d['41']) * fabs(self.d['43'])#actual part size
+        if self.d['2'] == 'a-openwall':
+            part_weight = part_weight - (unit_weight * fabs(self.d['door_off_2']-self.d['door_off_1']) * fabs(self.d['door_height']))#remove door
+        if part_thickness and fixed_thickness and fabs(self.d['42']) != part_thickness/100:
+            self.d['alert'] = 'Different than Partition Type'
+        elif fabs(self.d['42']) < part_thickness/100:
+            self.d['alert'] = 'Partition too thin'
+        else:
+            if self.type_obj.image:
+                self.d['8'] = 'partition-' + self.type_obj.title
+                self.d['repeat'] = self.type_obj.pattern
+            if self.type_obj.color:
+                self.d['color'] = self.type_obj.color
+
+        #writing to csv file
+        self.csv_f.write(f'{self.d["num"]},{self.d["layer"]},{self.d["2"]},{self.type_obj.title},-,{self.d["10"]},{-self.d["20"]},{self.d["30"]},')
+        self.csv_f.write(f'{self.d["210"]},{-self.d["220"]},{self.d["50"]},{self.d["41"]},{self.d["42"]},{self.d["43"]},{part_weight},{self.d["alert"]} \n')
+        return part_weight
+
+    def write_html(self):
+        return f'<p>Hello! {self.d["alert"]}</p>'
