@@ -238,8 +238,13 @@ def make_html(self_page, collection, partitions, finishings, csv_f):
         elif data['2'] == 'a-door':
             part = APartition(data, partitions, finishings, csv_f)
             if part.type_obj:
-                weight = part.calc_weight()
-            output[x] = part.write_html()
+                part.calc_weight()
+            else:
+                part.no_weight()
+            if part.d['alert'] == 'None':
+                output[x] = part.write_html()
+            else:
+                output[x] = part.write_html_alert()
 
     return output
 
@@ -1100,7 +1105,8 @@ def make_openwall(x, data, partitions, finishings, csv_f):
 
 class APartition(object):
     def __init__(self, data, types, finishings, csv_f):
-        self.d = data
+        self.d = data#is it possible to use the self.__dict__=data construct? it would be much cleaner
+        self.d['alert'] = 'None'
         if self.d['type']:
             try:
                 self.type_obj = types.get(title = self.d['type'])
@@ -1111,7 +1117,6 @@ class APartition(object):
 
     def calc_weight(self):
 
-        self.d['alert'] = 'None'
         part_weight = 0
         unit_weight = 0
         zero_weight = 0
@@ -1144,7 +1149,32 @@ class APartition(object):
         #writing to csv file
         self.csv_f.write(f'{self.d["num"]},{self.d["layer"]},{self.d["2"]},{self.type_obj.title},-,{self.d["10"]},{-self.d["20"]},{self.d["30"]},')
         self.csv_f.write(f'{self.d["210"]},{-self.d["220"]},{self.d["50"]},{self.d["41"]},{self.d["42"]},{self.d["43"]},{part_weight},{self.d["alert"]} \n')
-        return part_weight
+        return
+
+    def no_weight(self):
+        #writing to csv file
+        self.csv_f.write(f'{self.d["num"]},{self.d["layer"]},{self.d["2"]},None,-,{self.d["10"]},{-self.d["20"]},{self.d["30"]},')
+        self.csv_f.write(f'{self.d["210"]},{-self.d["220"]},{self.d["50"]},{self.d["41"]},{self.d["42"]},{self.d["43"]},0,{self.d["alert"]} \n')
+        return
 
     def write_html(self):
-        return f'<p>Hello! {self.d["alert"]}</p>'
+        return f'<p>Hello! {self.d["num"]}</p>'
+
+    def write_html_alert(self):
+        outstr = f'<a-entity id="{self.d["2"]}-{self.d["num"]}-alert: {self.d["alert"]}" \n'
+        outstr += f'position="{self.d["10"]} {self.d["30"]} {self.d["20"]}" \n'
+        outstr += f'rotation="{self.d["210"]} {self.d["50"]} {self.d["220"]}">\n'
+        if self.d["2"] == 'a-openwall':#TODO three boxes
+            outstr += f'<a-box id="{self.d["2"]}-{self.d["num"]}" \n'
+            outstr += f'position="{self.d["41"]/2} {self.d["43"]/2} {-self.d["42"]/2}" \n'
+            outstr += f'scale="{fabs(self.d["41"])} {fabs(self.d["43"])} {fabs(self.d["42"])}" \n'
+            outstr += 'material="color: red;">\n'
+            outstr += '</a-box>\n'
+        else:
+            outstr += f'<a-box id="{self.d["2"]}-{self.d["num"]}" \n'
+            outstr += f'position="{self.d["41"]/2} {self.d["43"]/2} {-self.d["42"]/2}" \n'
+            outstr += f'scale="{fabs(self.d["41"])} {fabs(self.d["43"])} {fabs(self.d["42"])}" \n'
+            outstr += 'material="color: red;">\n'
+            outstr += '</a-box>\n'
+        outstr += '</a-entity>\n'
+        return outstr
