@@ -229,13 +229,13 @@ def make_html(self_page, collection, partitions, finishings, csv_f):
         elif data['2'] == 'a-wall':
             output[x] = make_wall(x, data, partitions, finishings, csv_f)
 
-        elif data['2'] == 'a-openwall':
-            output[x] = make_openwall(x, data, partitions, finishings, csv_f)
+        #elif data['2'] == 'a-openwall':
+            #output[x] = make_openwall(x, data, partitions, finishings, csv_f)
 
         elif data['2'] == 'a-slab':
             output[x] = make_slab(x, data, partitions, finishings, csv_f)
 
-        elif data['2'] == 'a-door':
+        elif data['2'] == 'a-openwall':
             part = APartition(data, partitions, finishings, csv_f)
             if part.type_obj:
                 part.calc_weight()
@@ -1164,14 +1164,24 @@ class APartition(object):
         outstr = f'<a-entity id="{self.d["2"]}-{self.d["num"]}-alert: {self.d["alert"]}" \n'
         outstr += f'position="{self.d["10"]} {self.d["30"]} {self.d["20"]}" \n'
         outstr += f'rotation="{self.d["210"]} {self.d["50"]} {self.d["220"]}">\n'
-        if self.d["2"] == 'a-openwall':#TODO three boxes
-            outstr += f'<a-box id="{self.d["2"]}-{self.d["num"]}" \n'
-            outstr += f'position="{self.d["41"]/2} {self.d["43"]/2} {-self.d["42"]/2}" \n'
-            outstr += f'scale="{fabs(self.d["41"])} {fabs(self.d["43"])} {fabs(self.d["42"])}" \n'
+        if self.d["2"] == 'a-openwall':
+            outstr += f'<a-box id="{self.d["2"]}-{self.d["num"]}-alert-left" \n'
+            outstr += f'position="{self.d["door_off_1"]/2} {self.d["door_height"]/2} {-self.d["42"]/2}" \n'
+            outstr += f'scale="{fabs(self.d["door_off_1"])} {fabs(self.d["door_height"])} {fabs(self.d["42"])}" \n'
+            outstr += 'material="color: red;">\n'
+            outstr += '</a-box>\n'
+            outstr += f'<a-box id="{self.d["2"]}-{self.d["num"]}-alert-right" \n'
+            outstr += f'position="{(self.d["41"]-self.d["door_off_2"])/2+self.d["door_off_2"]} {self.d["door_height"]/2} {-self.d["42"]/2}" \n'
+            outstr += f'scale="{fabs(self.d["41"]-self.d["door_off_2"])} {fabs(self.d["door_height"])} {fabs(self.d["42"])}" \n'
+            outstr += 'material="color: red;">\n'
+            outstr += '</a-box>\n'
+            outstr += f'<a-box id="{self.d["2"]}-{self.d["num"]}-alert-top" \n'
+            outstr += f'position="{self.d["41"]/2} {(self.d["43"] - self.d["door_height"])/2+self.d["door_height"]} {-self.d["42"]/2}" \n'
+            outstr += f'scale="{fabs(self.d["41"])} {fabs(self.d["43"] - self.d["door_height"])} {fabs(self.d["42"])}" \n'
             outstr += 'material="color: red;">\n'
             outstr += '</a-box>\n'
         else:
-            outstr += f'<a-box id="{self.d["2"]}-{self.d["num"]}" \n'
+            outstr += f'<a-box id="{self.d["2"]}-{self.d["num"]}-alert" \n'
             outstr += f'position="{self.d["41"]/2} {self.d["43"]/2} {-self.d["42"]/2}" \n'
             outstr += f'scale="{fabs(self.d["41"])} {fabs(self.d["43"])} {fabs(self.d["42"])}" \n'
             outstr += 'material="color: red;">\n'
