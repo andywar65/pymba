@@ -226,16 +226,16 @@ def make_html(self_page, collection, partitions, finishings, csv_f):
         elif data['2'] == 'a-link':
             output[x] = make_link(self_page, x, data)
 
-        elif data['2'] == 'a-wall':
-            output[x] = make_wall(x, data, partitions, finishings, csv_f)
+        #elif data['2'] == 'a-wall':
+            #output[x] = make_wall(x, data, partitions, finishings, csv_f)
 
         #elif data['2'] == 'a-openwall':
             #output[x] = make_openwall(x, data, partitions, finishings, csv_f)
 
-        elif data['2'] == 'a-slab':
-            output[x] = make_slab(x, data, partitions, finishings, csv_f)
+        #elif data['2'] == 'a-slab':
+            #output[x] = make_slab(x, data, partitions, finishings, csv_f)
 
-        elif data['2'] == 'a-openwall':
+        elif data['2'] == 'a-wall' or data['2'] == 'a-slab' or data['2'] == 'a-openwall':
             part = APartition(data, partitions, finishings, csv_f)
             if part.type_obj:
                 part.calc_weight()
@@ -1158,7 +1158,68 @@ class APartition(object):
         return
 
     def write_html(self):
-        return f'<p>Hello! {self.d["num"]}</p>'
+        #start entity
+        outstr = f'<a-entity id="{self.d["2"]}-{self.d["num"]}" \n'
+        outstr += f'position="{self.d["10"]} {self.d["30"]} {self.d["20"]}" \n'
+        outstr += f'rotation="{self.d["210"]} {self.d["50"]} {self.d["220"]}">\n'
+
+        #top
+        if self.d['2'] == 'a-slab':
+            side = 'floor'
+            y = 0
+        else:
+            side = 'top'
+            y = self.d['43']
+        outstr += f'<a-plane id="{self.d["2"]}-{self.d["num"]}-{side}" \n'
+        outstr += f'position="{self.d["41"]/2} {y} {-self.d["42"]/2}" \n'
+        if self.d['43'] < 0:
+            outstr += f'rotation="90 0 0" \n'
+        else:
+            outstr += f'rotation="-90 0 0" \n'
+        outstr += f'width="{fabs(self.d["41"])}" height="{fabs(self.d["42"])}" \n'
+        if self.d['2'] == 'a-slab':
+            outstr += slab_finishing(side)
+        else:
+            outstr += f'material="src: #image-{self.d["8"]}; color: {self.d["color"]}'
+            outstr += is_repeat(self.d['repeat'], self.d['41'], self.d['42'])
+            outstr += '">\n'
+        outstr += '</a-plane> \n'
+
+        #end entity
+        outstr += '</a-entity>\n'
+        return outstr
+
+    def slab_finishing(self, side):
+        try:
+            finishing = self.finishings.get(title = self.d[side])
+            if finishing.image:
+                slab_image = 'finishing-' + finishing.title
+                slab_repeat = finishing.pattern
+            else:
+                slab_image = self.d['8']
+                slab_repeat = self.d['repeat']
+            if finishing.color:
+                slab_color = finishing.color
+            else:
+                slab_color = self.d['color']
+
+            self.csv_f.write(f'{self.d["num"]},{self.d["layer"]},a-slab/{side},{slab_image},-,-,-,-,-,-,-,{self.d["41"]},{self.d["42"]},-,-,- \n')
+        except:
+            slab_image = self.d['8']
+            slab_repeat = self.d['repeat']
+            slab_color = self.d['color']
+
+        outstr = f'material="src: #image-{slab_image}; color: {slab_color}'
+        outstr += is_repeat(slab_repeat, self.d['41'], self.d['42'])
+        outstr += '">\n'
+        return outstr
+
+    def is_repeat(self, repeat, rx, rz):
+        if repeat:
+            output = f'; repeat:{fabs(rx)} {fabs(ry)}'
+            return output
+        else:
+            return ';'
 
     def write_html_alert(self):
         outstr = f'<a-entity id="{self.d["2"]}-{self.d["num"]}-alert: {self.d["alert"]}" \n'
