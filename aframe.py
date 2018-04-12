@@ -1162,61 +1162,213 @@ class APartition(object):
         outstr = f'<a-entity id="{self.d["2"]}-{self.d["num"]}" \n'
         outstr += f'position="{self.d["10"]} {self.d["30"]} {self.d["20"]}" \n'
         outstr += f'rotation="{self.d["210"]} {self.d["50"]} {self.d["220"]}">\n'
-
-        #top
+        #slab handle is on top
         if self.d['2'] == 'a-slab':
-            side = 'floor'
-            y = 0
-        else:
-            side = 'top'
             y = self.d['43']
-        outstr += f'<a-plane id="{self.d["2"]}-{self.d["num"]}-{side}" \n'
-        outstr += f'position="{self.d["41"]/2} {y} {-self.d["42"]/2}" \n'
-        if self.d['43'] < 0:
-            outstr += f'rotation="90 0 0" \n'
         else:
-            outstr += f'rotation="-90 0 0" \n'
-        outstr += f'width="{fabs(self.d["41"])}" height="{fabs(self.d["42"])}" \n'
+            y = 0
+
+        #top surface
         if self.d['2'] == 'a-slab':
-            outstr += slab_finishing(side)
+            self.d['side'] = 'floor'
         else:
-            outstr += f'material="src: #image-{self.d["8"]}; color: {self.d["color"]}'
-            outstr += is_repeat(self.d['repeat'], self.d['41'], self.d['42'])
-            outstr += '">\n'
-        outstr += '</a-plane> \n'
+            self.d['side'] = 'top'
+        self.d['sub_side'] = self.d['side']
+        self.d['width'] = fabs(self.d['41'])
+        self.d['height'] = fabs(self.d['42'])
+
+        outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-{self.d["side"]}-ent" \n'
+        outstr += f'position="{self.d["41"]/2} {self.d["43"]-y} 0" \n'
+        if self.d['43'] > 0:
+            outstr += 'rotation="-90 0 0"> \n'
+        else:
+            outstr += 'rotation="-90 180 0"> \n'
+        outstr += self.part_simple_finishing()
+        outstr += '</a-entity> \n'
+
+        #bottom surface, a-openwall has left and right bottoms
+        if self.d['2'] == 'a-wall' or self.d['2'] == 'a-slab':
+            if self.d['2'] == 'a-slab':
+                self.d['side'] = 'ceiling'
+            else:
+                self.d['side'] = 'bottom'
+            self.d['sub_side'] = self.d['side']
+            self.d['width'] = fabs(self.d['41'])
+            self.d['height'] = fabs(self.d['42'])
+
+            outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-{self.d["side"]}-ent" \n'
+            outstr += f'position="{self.d["41"]/2} {-y} 0" \n'
+            if self.d['43'] > 0:
+                outstr += 'rotation="90 180 0"> \n'
+            else:
+                outstr += 'rotation="90 0 0"> \n'
+            outstr += self.part_simple_finishing()
+            outstr += '</a-entity> \n'
+
+        #inside surface, a-openwall has left, right and top insides
+        if self.d['2'] == 'a-wall' or self.d['2'] == 'a-slab':
+            if self.d['2'] == 'a-slab':
+                self.d['side'] = 'front'
+            else:
+                self.d['side'] = 'in'
+            self.d['sub_side'] = self.d['side']
+            self.d['width'] = fabs(self.d['41'])
+            self.d['height'] = fabs(self.d['43'])
+
+            outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-{self.d["side"]}-ent" \n'
+            outstr += f'position="{self.d["41"]/2} {-y} 0" \n'
+            if self.d['42'] > 0:
+                outstr += 'rotation="0 180 0"> \n'
+            else:
+                outstr += '> \n'
+            if self.d['2'] == 'a-slab':
+                outstr += self.part_simple_finishing()
+            else:
+                outstr += self.part_striped_finishing()
+            outstr += '</a-entity> \n'
+
+        #outside surface, a-openwall has left, right and top outsides
+        if self.d['2'] == 'a-wall' or self.d['2'] == 'a-slab':
+            if self.d['2'] == 'a-slab':
+                self.d['side'] = 'back'
+            else:
+                self.d['side'] = 'out'
+            self.d['sub_side'] = self.d['side']
+            self.d['width'] = fabs(self.d['41'])
+            self.d['height'] = fabs(self.d['43'])
+
+            outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-{self.d["side"]}-ent" \n'
+            outstr += f'position="{self.d["41"]/2} {-y} {self.d["42"]}" \n'
+            if self.d['42'] < 0:
+                outstr += 'rotation="0 180 0"> \n'
+            else:
+                outstr += '> \n'
+            if self.d['2'] == 'a-slab':
+                outstr += self.part_simple_finishing()
+            else:
+                outstr += self.part_striped_finishing()
+            outstr += '</a-entity> \n'
+
+        #left surface
+        self.d['side'] = 'left'
+        self.d['sub_side'] = 'left'
+        self.d['width'] = fabs(self.d['42'])
+        self.d['height'] = fabs(self.d['43'])
+
+        outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-{self.d["side"]}-ent" \n'
+        outstr += f'position="0 {-y} {self.d["42"]/2}" \n'
+        if self.d['41'] > 0:
+            outstr += 'rotation="0 -90 0"> \n'
+        else:
+            outstr += 'rotation="0 90 0"> \n'
+        if self.d['2'] == 'a-slab':
+            outstr += self.part_simple_finishing()
+        else:
+            outstr += self.part_striped_finishing()
+        outstr += '</a-entity> \n'
+
+        #right surface
+        self.d['side'] = 'right'
+        self.d['sub_side'] = 'right'
+        self.d['width'] = fabs(self.d['42'])
+        self.d['height'] = fabs(self.d['43'])
+
+        outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-{self.d["side"]}-ent" \n'
+        outstr += f'position="{self.d["41"]} {-y} {self.d["42"]/2}" \n'
+        if self.d['41'] < 0:
+            outstr += 'rotation="0 -90 0"> \n'
+        else:
+            outstr += 'rotation="0 90 0"> \n'
+        if self.d['2'] == 'a-slab':
+            outstr += self.part_simple_finishing()
+        else:
+            outstr += self.part_striped_finishing()
+        outstr += '</a-entity> \n'
+
+        if self.d['2'] == 'a-openwall':
+            #inside left surface
+            self.d['side'] = 'in'
+            self.d['sub_side'] = 'in-left'
+            self.d['width'] = fabs(self.d['door_off_1'])
+            self.d['height'] = fabs(self.d['door_height'])
+
+            outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-{self.d["side"]}-left-ent" \n'
+            outstr += f'position="{self.d["door_off_1"]/2} 0 0" \n'
+            if self.d['42'] > 0:
+                outstr += 'rotation="0 180 0"> \n'
+            else:
+                outstr += '> \n'
+            outstr += self.part_striped_finishing()
+            outstr += '</a-entity> \n'
+            #inside right surface
+            #inside top surface
+            #outside left surface
+            #outide right surface
+            #outide top surface
 
         #end entity
         outstr += '</a-entity>\n'
         return outstr
 
-    def slab_finishing(self, side):
+    def part_simple_finishing(self):
         try:
-            finishing = self.finishings.get(title = self.d[side])
+            finishing = self.finishings.get(title = self.d['side'])
             if finishing.image:
-                slab_image = 'finishing-' + finishing.title
-                slab_repeat = finishing.pattern
+                part_image = 'finishing-' + finishing.title
+                part_repeat = finishing.pattern
             else:
-                slab_image = self.d['8']
-                slab_repeat = self.d['repeat']
+                part_image = self.d['8']
+                part_repeat = self.d['repeat']
             if finishing.color:
-                slab_color = finishing.color
+                part_color = finishing.color
             else:
-                slab_color = self.d['color']
+                part_color = self.d['color']
 
-            self.csv_f.write(f'{self.d["num"]},{self.d["layer"]},a-slab/{side},{slab_image},-,-,-,-,-,-,-,{self.d["41"]},{self.d["42"]},-,-,- \n')
+            self.csv_f.write(f'{self.d["num"]},{self.d["layer"]},{self.d["2"]}/{self.d["sub_side"]},{part_image},-,-,-,-,-,-,-,{self.d["width"]},{self.d["height"]},-,-,- \n')
         except:
-            slab_image = self.d['8']
-            slab_repeat = self.d['repeat']
-            slab_color = self.d['color']
+            part_image = self.d['8']
+            part_repeat = self.d['repeat']
+            part_color = self.d['color']
 
-        outstr = f'material="src: #image-{slab_image}; color: {slab_color}'
-        outstr += is_repeat(slab_repeat, self.d['41'], self.d['42'])
-        outstr += '">\n'
+        outstr = f'<a-plane id="{self.d["2"]}-{self.d["num"]}-{self.d["sub_side"]}" \n'
+        outstr += f'position="0 {self.d["height"]/2} 0" \n'
+        outstr += f'width="{self.d["width"]}" height="{self.d["height"]}"\n'
+        outstr += f'material="src: #image-{part_image}; color: {part_color}'
+        outstr += is_repeat(part_repeat, self.d['width'], self.d['height'])
+        outstr += '">\n</a-plane>\n'
+        return outstr
+
+    def part_striped_finishing(self):
+        try:
+            finishing = self.finishings.get(title = self.d['side'])
+            if finishing.image:
+                part_image = 'finishing-' + finishing.title
+                part_repeat = finishing.pattern
+            else:
+                part_image = self.d['8']
+                part_repeat = self.d['repeat']
+            if finishing.color:
+                part_color = finishing.color
+            else:
+                part_color = self.d['color']
+
+            self.csv_f.write(f'{self.d["num"]},{self.d["layer"]},{self.d["2"]}/{self.d["sub_side"]},{part_image},-,-,-,-,-,-,-,{self.d["width"]},{self.d["height"]},-,-,- \n')
+        except:
+            part_image = self.d['8']
+            part_repeat = self.d['repeat']
+            part_color = self.d['color']
+
+        outstr = f'<a-plane id="{self.d["2"]}-{self.d["num"]}-{self.d["sub_side"]}" \n'
+        outstr += f'position="0 {self.d["height"]/2} 0" \n'
+        outstr += f'width="{self.d["width"]}" height="{self.d["height"]}"\n'
+        outstr += f'material="src: #image-{part_image}; color: {part_color}'
+        outstr += is_repeat(part_repeat, self.d['width'], self.d['height'])
+        outstr += '">\n</a-plane>\n'
         return outstr
 
     def is_repeat(self, repeat, rx, rz):
         if repeat:
-            output = f'; repeat:{fabs(rx)} {fabs(ry)}'
+            output = f'; repeat:{rx} {ry}'
             return output
         else:
             return ';'
