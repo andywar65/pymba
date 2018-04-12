@@ -1286,13 +1286,41 @@ class APartition(object):
         outstr += '</a-entity> \n'
 
         if self.d['2'] == 'a-openwall':
+            #bottom left surface
+            self.d['side'] = 'bottom'
+            self.d['sub_side'] = 'bottom-left'
+            self.d['width'] = fabs(self.d['door_off_1'])
+            self.d['height'] = fabs(self.d['42'])
+
+            outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-{self.d["sub_side"]}-ent" \n'
+            outstr += f'position="{self.d["door_off_1"]/2} 0 0" \n'
+            if self.d['43'] > 0:
+                outstr += 'rotation="90 180 0"> \n'
+            else:
+                outstr += 'rotation="90 0 0"> \n'
+            outstr += self.part_simple_finishing()
+            outstr += '</a-entity> \n'
+            #bottom right surface
+            self.d['side'] = 'bottom'
+            self.d['sub_side'] = 'bottom-right'
+            self.d['width'] = fabs(self.d['41']-self.d['door_off_2'])
+            self.d['height'] = fabs(self.d['42'])
+
+            outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-{self.d["sub_side"]}-ent" \n'
+            outstr += f'position="{self.d["width"]/2+self.d["door_off_2"]} 0 0" \n'
+            if self.d['43'] > 0:
+                outstr += 'rotation="90 180 0"> \n'
+            else:
+                outstr += 'rotation="90 0 0"> \n'
+            outstr += self.part_simple_finishing()
+            outstr += '</a-entity> \n'
             #inside left surface
             self.d['side'] = 'in'
             self.d['sub_side'] = 'in-left'
             self.d['width'] = fabs(self.d['door_off_1'])
             self.d['height'] = fabs(self.d['door_height'])
 
-            outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-{self.d["side"]}-left-ent" \n'
+            outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-{self.d["sub_side"]}-ent" \n'
             outstr += f'position="{self.d["door_off_1"]/2} 0 0" \n'
             if self.d['42'] > 0:
                 outstr += 'rotation="0 180 0"> \n'
@@ -1301,10 +1329,75 @@ class APartition(object):
             outstr += self.part_striped_finishing()
             outstr += '</a-entity> \n'
             #inside right surface
+            self.d['side'] = 'in'
+            self.d['sub_side'] = 'in-right'
+            self.d['width'] = fabs(self.d['41']-self.d['door_off_2'])
+            self.d['height'] = fabs(self.d['door_height'])
+
+            outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-{self.d["sub_side"]}-ent" \n'
+            outstr += f'position="{self.d["width"]/2+self.d["door_off_2"]} 0 0" \n'
+            if self.d['42'] > 0:
+                outstr += 'rotation="0 180 0"> \n'
+            else:
+                outstr += '> \n'
+            outstr += self.part_striped_finishing()
+            outstr += '</a-entity> \n'
             #inside top surface
+            self.d['side'] = 'in'
+            self.d['sub_side'] = 'in-top'
+            self.d['width'] = fabs(self.d['41'])
+            self.d['height'] = fabs(self.d['43']-self.d['door_height'])
+
+            outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-{self.d["sub_side"]}-ent" \n'
+            outstr += f'position="{self.d["width"]/2} {self.d["door_height"]} 0" \n'
+            if self.d['42'] > 0:
+                outstr += 'rotation="0 180 0"> \n'
+            else:
+                outstr += '> \n'
+            outstr += self.part_striped_finishing()
+            outstr += '</a-entity> \n'
             #outside left surface
-            #outide right surface
-            #outide top surface
+            self.d['side'] = 'out'
+            self.d['sub_side'] = 'out-left'
+            self.d['width'] = fabs(self.d['door_off_1'])
+            self.d['height'] = fabs(self.d['door_height'])
+
+            outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-{self.d["sub_side"]}-ent" \n'
+            outstr += f'position="{self.d["door_off_1"]/2} 0 {self.d["42"]}" \n'
+            if self.d['42'] < 0:
+                outstr += 'rotation="0 180 0"> \n'
+            else:
+                outstr += '> \n'
+            outstr += self.part_striped_finishing()
+            outstr += '</a-entity> \n'
+            #outside right surface
+            self.d['side'] = 'out'
+            self.d['sub_side'] = 'out-right'
+            self.d['width'] = fabs(self.d['41']-self.d['door_off_2'])
+            self.d['height'] = fabs(self.d['door_height'])
+
+            outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-{self.d["sub_side"]}-ent" \n'
+            outstr += f'position="{self.d["width"]/2+self.d["door_off_2"]} 0 {self.d["42"]}" \n'
+            if self.d['42'] < 0:
+                outstr += 'rotation="0 180 0"> \n'
+            else:
+                outstr += '> \n'
+            outstr += self.part_striped_finishing()
+            outstr += '</a-entity> \n'
+            #outside top surface
+            self.d['side'] = 'out'
+            self.d['sub_side'] = 'out-top'
+            self.d['width'] = fabs(self.d['41'])
+            self.d['height'] = fabs(self.d['43']-self.d['door_height'])
+
+            outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-{self.d["sub_side"]}-ent" \n'
+            outstr += f'position="{self.d["width"]/2} {self.d["door_height"]} {self.d["42"]}" \n'
+            if self.d['42'] < 0:
+                outstr += 'rotation="0 180 0"> \n'
+            else:
+                outstr += '> \n'
+            outstr += self.part_striped_finishing()
+            outstr += '</a-entity> \n'
 
         #end entity
         outstr += '</a-entity>\n'
