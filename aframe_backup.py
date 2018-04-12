@@ -226,6 +226,15 @@ def make_html(self_page, collection, partitions, finishings, csv_f):
         elif data['2'] == 'a-link':
             output[x] = make_link(self_page, x, data)
 
+        #elif data['2'] == 'a-wall':
+            #output[x] = make_wall(x, data, partitions, finishings, csv_f)
+
+        #elif data['2'] == 'a-openwall':
+            #output[x] = make_openwall(x, data, partitions, finishings, csv_f)
+
+        #elif data['2'] == 'a-slab':
+            #output[x] = make_slab(x, data, partitions, finishings, csv_f)
+
         elif data['2'] == 'a-wall' or data['2'] == 'a-slab' or data['2'] == 'a-openwall':
             part = APartition(data, partitions, finishings, csv_f)
             if part.type_obj:
@@ -580,6 +589,126 @@ def make_light(x, data):
         outstr += '">\n</a-entity>\n'#close light entity
     return outstr
 
+def make_wall(x, data, partitions, finishings, csv_f):
+    data['alert'] = 'None'#outside the try or they could crash file write
+    wall_weight = 0
+    if data['type']:
+        try:
+            wall_type = partitions.get(title = data['type'])
+            wall_thickness = 0
+            fixed_thickness = True
+            unit_weight = 0
+            zero_weight = 0
+            for wall_layer in wall_type.part_layers.all():
+                wall_layer_thickness = fabs(float(wall_layer.thickness))
+                wall_layer_weight = fabs(float(wall_layer.weight))
+                if wall_layer_thickness == 0:
+                    fixed_thickness = False
+                    zero_weight = wall_layer_weight
+                wall_thickness += wall_layer_thickness
+                unit_weight += wall_layer_thickness/100 * wall_layer_weight
+            unit_weight += (fabs(data['42']) - wall_thickness/100) * zero_weight#add eventual zero thickness layer
+            wall_weight = unit_weight * fabs(data['41']) * fabs(data['43'])#actual wall size
+            if wall_thickness and fixed_thickness and fabs(data['42']) != wall_thickness/100:
+                data['alert'] = 'Different than Wall Type'
+            elif fabs(data['42']) < wall_thickness/100:
+                data['alert'] = 'Wall too thin'
+            else:
+                if wall_type.image:
+                    data['8'] = 'partition-' + wall_type.title
+                    data['repeat'] = wall_type.pattern
+                if wall_type.color:
+                    data['color'] = wall_type.color
+
+        except:
+            pass
+    #writing to csv file
+    csv_f.write(f'{x},{data["layer"]},{data["2"]},{data["type"]},-,{data["10"]},{-data["20"]},{data["30"]},')
+    csv_f.write(f'{data["210"]},{-data["220"]},{data["50"]},{data["41"]},{data["42"]},{data["43"]},{wall_weight},{data["alert"]} \n')
+    #start wall entity
+    outstr = f'<a-entity id="wall-{x}-ent" \n'
+    outstr += f'position="{data["10"]} {data["30"]} {data["20"]}" \n'
+    outstr += f'rotation="{data["210"]} {data["50"]} {data["220"]}">\n'
+    if data['alert'] == 'None':#we have 6 planes, not a box
+        #wall top
+        outstr += f'<a-plane id="wall-{x}-top" \n'
+        outstr += f'position="{data["41"]/2} {data["43"]} {-data["42"]/2}" \n'
+        if data['43'] < 0:
+            outstr += f'rotation="90 0 0" \n'
+        else:
+            outstr += f'rotation="-90 0 0" \n'
+        outstr += f'width="{fabs(data["41"])}" height="{fabs(data["42"])}" \n'
+        outstr += f'material="src: #image-{data["8"]}; color: {data["color"]}'
+        outstr += is_repeat(data["repeat"], data["41"], data["42"])
+        outstr += '">\n</a-plane> \n'
+        #wall bottom
+        outstr += f'<a-plane id="wall-{x}-bottom" \n'
+        outstr += f'position="{data["41"]/2} 0 {-data["42"]/2}" \n'
+        if data['43'] < 0:
+            outstr += f'rotation="-90 0 0" \n'
+        else:
+            outstr += f'rotation="90 0 0" \n'
+        outstr += f'width="{fabs(data["41"])}" height="{fabs(data["42"])}" \n'
+        outstr += f'material="src: #image-{data["8"]}; color: {data["color"]}'
+        outstr += is_repeat(data["repeat"], data["41"], data["42"])
+        outstr += '">\n</a-plane> \n'
+
+        #wall inside
+        outstr += f'<a-entity id="wall-{x}-in-ent" \n'
+        outstr += f'position="{data["41"]/2} 0 0" \n'
+        if data['42'] < 0:
+            outstr += 'rotation="0 180 0"> \n'
+        else:
+            outstr += '> \n'
+        side = 'in'
+        width = data['41']
+        outstr += make_wall_finishing(x, data, finishings, width, side, csv_f)
+        outstr += '</a-entity> \n'
+
+        #wall outside
+        outstr += f'<a-entity id="wall-{x}-out-ent" \n'
+        outstr += f'position="{data["41"]/2} 0 {-data["42"]}" \n'
+        if data['42'] > 0:
+            outstr += 'rotation="0 180 0"> \n'
+        else:
+            outstr += '> \n'
+        side = 'out'
+        outstr += make_wall_finishing(x, data, finishings, width, side, csv_f)
+        outstr += '</a-entity> \n'
+
+        #wall left
+        outstr += f'<a-entity id="wall-{x}-left-ent" \n'
+        outstr += f'position="0 0 {-data["42"]/2}" \n'
+        if data['41'] > 0:
+            outstr += 'rotation="0 -90 0"> \n'
+        else:
+            outstr += 'rotation="0 90 0"> \n'
+        side = 'left'
+        width = data['42']
+        outstr += make_wall_finishing(x, data, finishings, width, side, csv_f)
+        outstr += '</a-entity> \n'
+
+        #wall right
+        outstr += f'<a-entity id="wall-{x}-right-ent" \n'
+        outstr += f'position="{data["41"]} 0 {-data["42"]/2}" \n'
+        if data['41'] > 0:
+            outstr += 'rotation="0 90 0"> \n'
+        else:
+            outstr += 'rotation="0 -90 0"> \n'
+        side = 'right'
+        outstr += make_wall_finishing(x, data, finishings, width, side, csv_f)
+        outstr += '</a-entity> \n'
+        outstr += '</a-entity>\n'
+
+    else:#there is an alert, the wall gets painted red
+        outstr += f'<a-box id="wall-{x}-alert" \n'
+        outstr += f'position="{data["41"]/2} {data["43"]/2} {-data["42"]/2}" \n'
+        outstr += f'scale="{fabs(data["41"])} {fabs(data["43"])} {fabs(data["42"])}" \n'
+        outstr += 'material="color: red;'
+        outstr += '">\n</a-box>\n </a-entity>\n'
+
+    return outstr
+
 def make_wall_finishing(x, data, finishings, width, side, csv_f):
     if data['2']=='a-openwall' and (side=='in-top' or side=='out-top'):
         door_height = fabs(data['door_height'])*data['43']/fabs(data['43'])
@@ -648,6 +777,330 @@ def make_wall_finishing(x, data, finishings, width, side, csv_f):
         outstr += f'material="src: #image-{data["8"]}; color: {data["color"]}'
         outstr += is_repeat(data["repeat"], width, data["43"]-door_height)
         outstr += '">\n</a-plane> \n'
+    return outstr
+
+def make_slab(x, data, partitions, finishings, csv_f):
+    data['alert'] = 'None'#outside the try or they could crash file write
+    slab_weight = 0
+    if data['type']:
+        try:
+            slab_type = partitions.get(title = data['type'])
+            slab_thickness = 0
+            fixed_thickness = True
+            unit_weight = 0
+            zero_weight = 0
+            for slab_layer in slab_type.part_layers.all():
+                slab_layer_thickness = fabs(float(slab_layer.thickness))
+                slab_layer_weight = fabs(float(slab_layer.weight))
+                if slab_layer_thickness == 0:
+                    fixed_thickness = False
+                    zero_weight = slab_layer_weight
+                slab_thickness += slab_layer_thickness
+                unit_weight += slab_layer_thickness/100 * slab_layer_weight
+            unit_weight += (fabs(data['43']) - slab_thickness/100) * zero_weight#add eventual zero thickness layer
+            slab_weight = unit_weight * fabs(data['41']) * fabs(data['42'])#actual slab size
+            if slab_thickness and fixed_thickness and fabs(data['43']) != slab_thickness/100:
+                data['alert'] = 'Different than Wall/Slab Type'
+            elif fabs(data['43']) < slab_thickness/100:
+                data['alert'] = 'Slab too thin'
+            else:
+                if slab_type.image:
+                    data['8'] = 'partition-' + slab_type.title
+                    data['repeat']= slab_type.pattern
+                if slab_type.color:
+                    data['color'] = slab_type.color
+
+        except:
+            pass
+    #writing to csv file
+    csv_f.write(f'{x},{data["layer"]},{data["2"]},{data["type"]},-,{data["10"]},{-data["20"]},{data["30"]},')
+    csv_f.write(f'{data["210"]},{-data["220"]},{data["50"]},{data["41"]},{data["42"]},{data["43"]},{slab_weight},{data["alert"]} \n')
+    #start slab entity
+    outstr = f'<a-entity id="slab-{x}-ent" \n'
+    outstr += f'position="{data["10"]} {data["30"]} {data["20"]}" \n'
+    outstr += f'rotation="{data["210"]} {data["50"]} {data["220"]}">\n'
+    if data['alert'] == 'None':#we have 6 planes, not a box
+        #slab top (floor)
+        outstr += f'<a-entity id="slab-{x}-floor-ent" \n'
+        outstr += f'position="{data["41"]/2} 0 {-data["42"]/2}" \n'
+        if data['43'] < 0:
+            outstr += f'rotation="90 0 0"> \n'
+        else:
+            outstr += f'rotation="-90 0 0"> \n'
+        side = 'floor'
+        outstr += make_slab_finishing(x, data, finishings, side, csv_f)
+        outstr += '</a-entity> \n'
+
+        #slab bottom (ceiling)
+        outstr += f'<a-entity id="slab-{x}-ceiling-ent" \n'
+        outstr += f'position="{data["41"]/2} {-data["43"]} {-data["42"]/2}" \n'
+        if data['43'] < 0:
+            outstr += f'rotation="-90 0 0"> \n'
+        else:
+            outstr += f'rotation="90 0 0"> \n'
+        side = 'ceiling'
+        outstr += make_slab_finishing(x, data, finishings, side, csv_f)
+        outstr += '</a-entity> \n'
+
+        #slab front
+        outstr += f'<a-plane id="slab-{x}-front" \n'
+        outstr += f'position="{data["41"]/2} {-data["43"]/2} 0" \n'
+        if data['42'] < 0:
+            outstr += 'rotation="0 180 0" \n'
+        outstr += f'width="{fabs(data["41"])}" height="{fabs(data["43"])}" \n'
+        outstr += f'material="src: #image-{data["8"]}; color: {data["color"]}'
+        outstr += is_repeat(data["repeat"], data["41"], data["43"])
+        outstr += '">\n</a-plane> \n'
+
+        #slab back
+        outstr += f'<a-plane id="slab-{x}-back" \n'
+        outstr += f'position="{data["41"]/2} {-data["43"]/2} {-data["42"]}" \n'
+        if data['42'] > 0:
+            outstr += 'rotation="0 180 0" \n'
+        outstr += f'width="{fabs(data["41"])}" height="{fabs(data["43"])}" \n'
+        outstr += f'material="src: #image-{data["8"]}; color: {data["color"]}'
+        outstr += is_repeat(data["repeat"], data["41"], data["43"])
+        outstr += '">\n</a-plane> \n'
+
+        #slab left
+        outstr += f'<a-plane id="slab-{x}-left" \n'
+        outstr += f'position="0 {-data["43"]/2} {-data["42"]/2}" \n'
+        if data['41'] > 0:
+            outstr += 'rotation="0 -90 0" \n'
+        else:
+            outstr += 'rotation="0 90 0" \n'
+        outstr += f'width="{fabs(data["42"])}" height="{fabs(data["43"])}" \n'
+        outstr += f'material="src: #image-{data["8"]}; color: {data["color"]}'
+        outstr += is_repeat(data["repeat"], data["42"], data["43"])
+        outstr += '">\n</a-plane> \n'
+
+        #slab right
+        outstr += f'<a-plane id="slab-{x}-right" \n'
+        outstr += f'position="{data["41"]} {-data["43"]/2} {-data["42"]/2}" \n'
+        if data['41'] > 0:
+            outstr += 'rotation="0 90 0" \n'
+        else:
+            outstr += 'rotation="0 -90 0" \n'
+        outstr += f'width="{fabs(data["42"])}" height="{fabs(data["43"])}" \n'
+        outstr += f'material="src: #image-{data["8"]}; color: {data["color"]}'
+        outstr += is_repeat(data["repeat"], data["42"], data["43"])
+        outstr += '">\n</a-plane> \n </a-entity>\n'
+
+    else:#there is an alert, the slab gets painted red
+        outstr += f'<a-box id="slab-{x}-alert" \n'
+        outstr += f'position="{data["41"]/2} {-data["43"]/2} {-data["42"]/2}" \n'
+        outstr += f'scale="{fabs(data["41"])} {fabs(data["43"])} {fabs(data["42"])}" \n'
+        outstr += 'material="color: red;'
+        outstr += '">\n</a-box>\n </a-entity>\n'
+
+    return outstr
+
+def make_slab_finishing(x, data, finishings, side, csv_f):
+    outstr = f'<a-plane id="slab-{x}-{side}" \n'
+    outstr += f'width="{fabs(data["41"])}" height="{fabs(data["42"])}" \n'
+    try:
+        finishing = finishings.get(title = data[side])
+        if finishing.image:
+            slab_image = 'finishing-' + finishing.title
+            slab_repeat = finishing.pattern
+        else:
+            slab_image = data['8']
+            slab_repeat = data['repeat']
+        if finishing.color:
+            slab_color = finishing.color
+        else:
+            slab_color = data['color']
+
+        outstr += f'material="src: #image-{slab_image}; color: {slab_color}'
+        outstr += is_repeat(slab_repeat, data["41"], data["42"])
+        csv_f.write(f'{x},{data["layer"]},a-slab/{side},{slab_image},-,-,-,-,-,-,-,{data["41"]},{data["42"]},-,-,- \n')
+    except:
+        outstr += f'material="src: #image-{data["8"]}; color: {data["color"]}'
+        outstr += is_repeat(data["repeat"], data["41"], data["42"])
+    outstr += '">\n</a-plane> \n'
+    return outstr
+
+def make_openwall(x, data, partitions, finishings, csv_f):
+    data['alert'] = 'None'#outside the try or they could crash file write
+    wall_weight = 0
+    if data['type']:
+        try:
+            wall_type = partitions.get(title = data['type'])
+            wall_thickness = 0
+            fixed_thickness = True
+            unit_weight = 0
+            zero_weight = 0
+            for wall_layer in wall_type.part_layers.all():
+                wall_layer_thickness = fabs(float(wall_layer.thickness))
+                wall_layer_weight = fabs(float(wall_layer.weight))
+                if wall_layer_thickness == 0:
+                    fixed_thickness = False
+                    zero_weight = wall_layer_weight
+                wall_thickness += wall_layer_thickness
+                unit_weight += wall_layer_thickness/100 * wall_layer_weight
+            unit_weight += (fabs(data['42']) - wall_thickness/100) * zero_weight#add eventual zero thickness layer
+            wall_weight = unit_weight * fabs(data['41']) * fabs(data['43'])#actual wall size
+            if data['2'] == 'a-openwall':
+                wall_weight = wall_weight - (unit_weight * fabs(data['door_off_2']-data['door_off_1']) * fabs(data['door_height']))#remove door
+            if wall_thickness and fixed_thickness and fabs(data['42']) != wall_thickness/100:
+                data['alert'] = 'Different than Wall Type'
+            elif fabs(data['42']) < wall_thickness/100:
+                data['alert'] = 'Wall too thin'
+            else:
+                if wall_type.image:
+                    data['8'] = 'partition-' + wall_type.title
+                    data['repeat'] = wall_type.pattern
+                if wall_type.color:
+                    data['color'] = wall_type.color
+
+        except:
+            pass
+    #writing to csv file
+    csv_f.write(f'{x},{data["layer"]},{data["2"]},{data["type"]},-,{data["10"]},{-data["20"]},{data["30"]},')
+    csv_f.write(f'{data["210"]},{-data["220"]},{data["50"]},{data["41"]},{data["42"]},{data["43"]},{wall_weight},{data["alert"]} \n')
+    #start openwall entity
+    outstr = f'<a-entity id="openwall-{x}-ent" \n'
+    outstr += f'position="{data["10"]} {data["30"]} {data["20"]}" \n'
+    outstr += f'rotation="{data["210"]} {data["50"]} {data["220"]}">\n'
+    if data['alert'] == 'None':#we have 6 planes, not a box
+        #openwall top
+        outstr += f'<a-plane id="openwall-{x}-top" \n'
+        outstr += f'position="{data["41"]/2} {data["43"]} {-data["42"]/2}" \n'
+        if data['43'] < 0:
+            outstr += f'rotation="90 0 0" \n'
+        else:
+            outstr += f'rotation="-90 0 0" \n'
+        outstr += f'width="{fabs(data["41"])}" height="{fabs(data["42"])}" \n'
+        outstr += f'material="src: #image-{data["8"]}; color: {data["color"]}'
+        outstr += is_repeat(data["repeat"], data["41"], data["42"])
+        outstr += '">\n</a-plane> \n'
+        #openwall bottom left
+        outstr += f'<a-plane id="openwall-{x}-bottom-left" \n'
+        outstr += f'position="{data["door_off_1"]/2} 0 {-data["42"]/2}" \n'
+        if data['43'] < 0:
+            outstr += f'rotation="-90 0 0" \n'
+        else:
+            outstr += f'rotation="90 0 0" \n'
+        outstr += f'width="{fabs(data["door_off_1"])}" height="{fabs(data["42"])}" \n'
+        outstr += f'material="src: #image-{data["8"]}; color: {data["color"]}'
+        outstr += is_repeat(data["repeat"], data["door_off_1"], data["42"])
+        outstr += '">\n</a-plane> \n'
+        #openwall bottom right
+        outstr += f'<a-plane id="openwall-{x}-bottom-right" \n'
+        width = data["41"]-data["door_off_2"]
+        outstr += f'position="{width/2+data["door_off_2"]} 0 {-data["42"]/2}" \n'
+        if data['43'] < 0:
+            outstr += f'rotation="-90 0 0" \n'
+        else:
+            outstr += f'rotation="90 0 0" \n'
+        outstr += f'width="{fabs(width)}" height="{fabs(data["42"])}" \n'
+        outstr += f'material="src: #image-{data["8"]}; color: {data["color"]}'
+        outstr += is_repeat(data["repeat"], width, data["42"])
+        outstr += '">\n</a-plane> \n'
+
+        #openwall inside left
+        outstr += f'<a-entity id="openwall-{x}-in-left-ent" \n'
+        outstr += f'position="{data["door_off_1"]/2} 0 0" \n'
+        if data['42'] < 0:
+            outstr += 'rotation="0 180 0"> \n'
+        else:
+            outstr += '> \n'
+        side = 'in-left'
+        width = data['door_off_1']
+        outstr += make_wall_finishing(x, data, finishings, width, side, csv_f)
+        outstr += '</a-entity> \n'
+
+        #openwall inside right
+        outstr += f'<a-entity id="openwall-{x}-in-right-ent" \n'
+        outstr += f'position="{(data["41"]-data["door_off_2"])/2+data["door_off_2"]} 0 0" \n'
+        if data['42'] < 0:
+            outstr += 'rotation="0 180 0"> \n'
+        else:
+            outstr += '> \n'
+        side = 'in-right'
+        width = data["41"]-data["door_off_2"]
+        outstr += make_wall_finishing(x, data, finishings, width, side, csv_f)
+        outstr += '</a-entity> \n'
+
+        #openwall inside top
+        outstr += f'<a-entity id="openwall-{x}-in-top-ent" \n'
+        outstr += f'position="{(data["door_off_2"]-data["door_off_1"])/2+data["door_off_1"]} {data["door_height"]} 0" \n'
+        if data['42'] < 0:
+            outstr += 'rotation="0 180 0"> \n'
+        else:
+            outstr += '> \n'
+        side = 'in-top'
+        width = data["door_off_2"]-data["door_off_1"]
+        outstr += make_wall_finishing(x, data, finishings, width, side, csv_f)
+        outstr += '</a-entity> \n'
+
+        #openwall outside left
+        outstr += f'<a-entity id="openwall-{x}-out-left-ent" \n'
+        outstr += f'position="{data["door_off_1"]/2} 0 {-data["42"]}" \n'
+        if data['42'] > 0:
+            outstr += 'rotation="0 180 0"> \n'
+        else:
+            outstr += '> \n'
+        side = 'out-left'
+        width = data['door_off_1']
+        outstr += make_wall_finishing(x, data, finishings, width, side, csv_f)
+        outstr += '</a-entity> \n'
+
+        #openwall outside right
+        outstr += f'<a-entity id="openwall-{x}-out-right-ent" \n'
+        outstr += f'position="{(data["41"]-data["door_off_2"])/2+data["door_off_2"]} 0 {-data["42"]}" \n'
+        if data['42'] > 0:
+            outstr += 'rotation="0 180 0"> \n'
+        else:
+            outstr += '> \n'
+        side = 'out-right'
+        width = data["41"]-data["door_off_2"]
+        outstr += make_wall_finishing(x, data, finishings, width, side, csv_f)
+        outstr += '</a-entity> \n'
+
+        #openwall outside top
+        outstr += f'<a-entity id="openwall-{x}-out-top-ent" \n'
+        outstr += f'position="{(data["door_off_2"]-data["door_off_1"])/2+data["door_off_1"]} {data["door_height"]} {-data["42"]}" \n'
+        if data['42'] > 0:
+            outstr += 'rotation="0 180 0"> \n'
+        else:
+            outstr += '> \n'
+        side = 'out-top'
+        width = data["door_off_2"]-data["door_off_1"]
+        outstr += make_wall_finishing(x, data, finishings, width, side, csv_f)
+        outstr += '</a-entity> \n'
+
+        #openwall left
+        outstr += f'<a-entity id="openwall-{x}-left-ent" \n'
+        outstr += f'position="0 0 {-data["42"]/2}" \n'
+        if data['41'] > 0:
+            outstr += 'rotation="0 -90 0"> \n'
+        else:
+            outstr += 'rotation="0 90 0"> \n'
+        side = 'left'
+        width = data['42']
+        outstr += make_wall_finishing(x, data, finishings, width, side, csv_f)
+        outstr += '</a-entity> \n'
+
+        #openwall right
+        outstr += f'<a-entity id="openwall-{x}-right-ent" \n'
+        outstr += f'position="{data["41"]} 0 {-data["42"]/2}" \n'
+        if data['41'] > 0:
+            outstr += 'rotation="0 90 0"> \n'
+        else:
+            outstr += 'rotation="0 -90 0"> \n'
+        side = 'right'
+        outstr += make_wall_finishing(x, data, finishings, width, side, csv_f)
+        outstr += '</a-entity> \n'
+        outstr += '</a-entity>\n'
+
+    else:#there is an alert, the wall gets painted red, TODO hole for door
+        outstr += f'<a-box id="openwall-{x}-alert" \n'
+        outstr += f'position="{data["41"]/2} {data["43"]/2} {-data["42"]/2}" \n'
+        outstr += f'scale="{fabs(data["41"])} {fabs(data["43"])} {fabs(data["42"])}" \n'
+        outstr += 'material="color: red;'
+        outstr += '">\n</a-box>\n </a-entity>\n'
+
     return outstr
 
 class APartition(object):
