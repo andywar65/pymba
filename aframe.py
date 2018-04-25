@@ -580,76 +580,6 @@ def make_light(x, data):
         outstr += '">\n</a-entity>\n'#close light entity
     return outstr
 
-def make_wall_finishing(x, data, finishings, width, side, csv_f):
-    if data['2']=='a-openwall' and (side=='in-top' or side=='out-top'):
-        door_height = fabs(data['door_height'])*data['43']/fabs(data['43'])
-    else:
-        door_height = 0
-
-    try:
-        if side=='in-left' or side=='in-right' or side=='in-top':
-            data_side = data['in']
-        elif side=='out-left' or side=='out-right' or side=='out-top':
-            data_side = data['out']
-        else:
-            data_side = data[side]
-        finishing = finishings.get(title = data_side)
-
-        tiling_height = fabs(float(finishing.tiling_height))/100*data['43']/fabs(data['43'])
-        skirting_height = fabs(float(finishing.skirting_height))/100*data['43']/fabs(data['43'])
-        if fabs(door_height) > fabs(data['43']):
-            door_height = data['43']
-        if fabs(skirting_height) < fabs(door_height):
-            skirting_height = door_height
-        if fabs(tiling_height) < fabs(skirting_height):
-            tiling_height = skirting_height
-        if fabs(tiling_height) < fabs(door_height):
-            tiling_height = door_height
-        wall_height = data['43'] - tiling_height
-        tiling_height = tiling_height - skirting_height
-        skirting_height = skirting_height - door_height
-
-        if finishing.image:
-            wall_image = 'finishing-' + finishing.title
-            wall_repeat = finishing.pattern
-        else:
-            wall_image = data['8']
-            wall_repeat = data['repeat']
-        if finishing.color:
-            wall_color = finishing.color
-        else:
-            wall_color = data['color']
-
-        outstr = f'<a-plane id="wall-{x}-{side}" \n'
-        outstr += f'position="0 {wall_height/2+tiling_height+skirting_height} 0" \n'
-        outstr += f'width="{fabs(width)}" height="{fabs(wall_height)}" \n'
-        outstr += f'material="src: #image-{wall_image}; color: {wall_color}'
-        outstr += is_repeat(wall_repeat, width, wall_height)
-        outstr += '">\n</a-plane> \n'
-        csv_f.write(f'{x},{data["layer"]},a-wall/{side},{wall_image},Wall,-,-,-,-,-,-,{width},-,{wall_height},-,- \n')
-        outstr += f'<a-plane id="wall-{x}-{side}-tiling" \n'
-        outstr += f'position="0 {tiling_height/2+skirting_height} 0" \n'
-        outstr += f'width="{fabs(width)}" height="{fabs(tiling_height)}" \n'
-        outstr += f'material="src: #image-tiling-{finishing.title}; color: {finishing.tiling_color}'
-        outstr += is_repeat(finishing.tiling_pattern, width, tiling_height)
-        outstr += '">\n</a-plane> \n'
-        csv_f.write(f'{x},{data["layer"]},a-wall/{side},{finishing.title},Tiling,-,-,-,-,-,-,{width},-,{tiling_height},-,- \n')
-        outstr += f'<a-plane id="wall-{x}-{side}-skirting" \n'
-        outstr += f'position="0 {skirting_height/2} 0" \n'
-        outstr += f'width="{fabs(width)}" height="{fabs(skirting_height)}" \n'
-        outstr += f'material="src: #image-skirting-{finishing.title}; color: {finishing.skirting_color}'
-        outstr += is_repeat(finishing.skirting_pattern, width, skirting_height)
-        outstr += '">\n</a-plane> \n'
-        csv_f.write(f'{x},{data["layer"]},a-wall/{side},{finishing.title},Skirting,-,-,-,-,-,-,{width},-,{skirting_height},-,- \n')
-    except:
-        outstr = f'<a-plane id="wall-{x}-{side}" \n'
-        outstr += f'position="0 {(data["43"]-door_height)/2} 0" \n'
-        outstr += f'width="{fabs(width)}" height="{fabs(data["43"]-door_height)}" \n'
-        outstr += f'material="src: #image-{data["8"]}; color: {data["color"]}'
-        outstr += is_repeat(data["repeat"], width, data["43"]-door_height)
-        outstr += '">\n</a-plane> \n'
-    return outstr
-
 class APartition(object):
     def __init__(self, data, types, finishings, csv_f):
         self.d = data#is it possible to use the self.__dict__=data construct? it would be much cleaner
@@ -991,12 +921,14 @@ class APartition(object):
             skirting_height = fabs(float(finishing.skirting_height))/100*self.d['43']/fabs(self.d['43'])
             if fabs(door_height) > fabs(self.d['height']):
                 door_height = self.d['height']
-            if fabs(skirting_height) < fabs(door_height):
-                skirting_height = door_height
-            if fabs(tiling_height) < fabs(skirting_height):
-                tiling_height = skirting_height
+            if fabs(tiling_height) > fabs(self.d['height']):
+                tiling_height = self.d['height']
             if fabs(tiling_height) < fabs(door_height):
                 tiling_height = door_height
+            if fabs(skirting_height) > fabs(tiling_height):
+                skirting_height = tiling_height
+            if fabs(skirting_height) < fabs(door_height):
+                skirting_height = door_height
             wall_height = self.d['height'] - tiling_height
             tiling_height = tiling_height - skirting_height
             skirting_height = skirting_height - door_height
