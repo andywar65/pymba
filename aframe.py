@@ -226,6 +226,17 @@ def make_html(self_page, collection, partitions, finishings, csv_f):
         elif data['2'] == 'a-link':
             output[x] = make_link(self_page, x, data)
 
+        elif data['2'] == 'a-door':
+            door = AOpening(data, partitions, finishings, csv_f)
+            if door.type_obj:
+                door.has_type()
+            else:
+                door.no_type()
+            if door.d['alert'] == 'None':
+                output[x] = door.write_html()
+            else:
+                pass #output[x] = door.write_html_alert()
+
         elif data['2'] == 'a-wall' or data['2'] == 'a-slab' or data['2'] == 'a-openwall':
             part = APartition(data, partitions, finishings, csv_f)
             if part.type_obj:
@@ -1011,3 +1022,37 @@ class APartition(object):
             outstr += '</a-box>\n'
         outstr += '</a-entity>\n'
         return outstr
+
+class AOpening(object):
+    def __init__(self, data, types, finishings, csv_f):
+        self.d = data#is it possible to use the self.__dict__=data construct? it would be much cleaner
+        self.d['alert'] = 'None'
+        if self.d['type']:
+            try:
+                self.type_obj = types.get(title = self.d['type'])
+            except:
+                self.type_obj = False
+        self.finishings = finishings
+        self.csv_f = csv_f
+
+    def has_type(self):
+        #we don't calculate door weight, but we change appearance accordingly to partition type
+        if self.type_obj.image:
+            self.d['8'] = 'partition-' + self.type_obj.title
+            self.d['repeat'] = self.type_obj.pattern
+        if self.type_obj.color:
+            self.d['color'] = self.type_obj.color
+        #writing to csv file
+        opening_weight = 0
+        self.csv_f.write(f'{self.d["num"]},{self.d["layer"]},{self.d["2"]},{self.type_obj.title},-,{self.d["10"]},{-self.d["20"]},{self.d["30"]},')
+        self.csv_f.write(f'{self.d["210"]},{-self.d["220"]},{self.d["50"]},{self.d["41"]},{self.d["42"]},{self.d["43"]},{opening_weight},{self.d["alert"]} \n')
+        return
+
+    def no_type(self):
+        #writing to csv file
+        self.csv_f.write(f'{self.d["num"]},{self.d["layer"]},{self.d["2"]},None,-,{self.d["10"]},{-self.d["20"]},{self.d["30"]},')
+        self.csv_f.write(f'{self.d["210"]},{-self.d["220"]},{self.d["50"]},{self.d["41"]},{self.d["42"]},{self.d["43"]},0,{self.d["alert"]} \n')
+        return
+
+    def write_html(self):
+        return '<p>A Door here</p>'
