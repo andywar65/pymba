@@ -234,7 +234,7 @@ def make_html(self_page, collection, partitions, finishings, csv_f):
                 door.no_type()
             if door.d['alert'] == 'None':
                 output[x] = door.write_html()
-            else:
+            else:#by now useless, if is always true
                 pass #output[x] = door.write_html_alert()
 
         elif data['2'] == 'a-wall' or data['2'] == 'a-slab' or data['2'] == 'a-openwall':
@@ -1043,7 +1043,7 @@ class AOpening(object):
         if self.type_obj.color:
             self.d['color'] = self.type_obj.color
         #writing to csv file
-        opening_weight = 0
+        opening_weight = 0#by now useless
         self.csv_f.write(f'{self.d["num"]},{self.d["layer"]},{self.d["2"]},{self.type_obj.title},-,{self.d["10"]},{-self.d["20"]},{self.d["30"]},')
         self.csv_f.write(f'{self.d["210"]},{-self.d["220"]},{self.d["50"]},{self.d["41"]},{self.d["42"]},{self.d["43"]},{opening_weight},{self.d["alert"]} \n')
         return
@@ -1055,4 +1055,28 @@ class AOpening(object):
         return
 
     def write_html(self):
-        return '<p>A Door here</p>'
+        #start entity
+        outstr = f'<a-entity id="{self.d["2"]}-{self.d["num"]}" \n'
+        outstr += f'position="{self.d["10"]} {self.d["30"]} {self.d["20"]}" \n'
+        outstr += f'rotation="{self.d["210"]} {self.d["50"]} {self.d["220"]}">\n'
+        #left frame
+        outstr += f'<a-box id="{self.d["2"]}-{self.d["num"]}-left-frame" \n'
+        outstr += f'position="{-0.049*self.d["41"]} {self.d["43"]/2} {self.d["42"]/2}" \n'
+        outstr += f'scale="0.1 {fabs(self.d["43"])} {fabs(self.d["42"])+0.02}" \n'
+        outstr += f'material="color: {self.d["color"]}>'
+        outstr += '</a-box>\n'
+        #right frame
+        outstr += f'<a-box id="{self.d["2"]}-{self.d["num"]}-right-frame" \n'
+        outstr += '></a-box>\n'
+        #top frame
+        outstr += f'<a-box id="{self.d["2"]}-{self.d["num"]}-top-frame" \n'
+        outstr += '></a-box>\n'
+        #animated hinge
+        outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-hinge" \n'
+        #moving part
+        outstr += f'><a-box id="{self.d["2"]}-{self.d["num"]}-moving-part" \n'
+        outstr += '></a-box>\n'
+        outstr += '</a-entity>\n'
+        #end entity
+        outstr += '</a-entity>\n'
+        return outstr
