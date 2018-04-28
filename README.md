@@ -1,6 +1,6 @@
 # PYMba
 
-A basic BIM as a [Django 1.11.4](https://www.djangoproject.com/) / [Wagtail 1.12](https://wagtail.io/) app that imports [CAD](https://en.wikipedia.org/wiki/AutoCAD_DXF) files and renders Virtual Reality using [A-Frame](https://aframe.io) library.
+A basic BIM as a [Django 1.11.4](https://www.djangoproject.com/) / [Wagtail 1.12](https://wagtail.io/) app that imports [CAD](https://en.wikipedia.org/wiki/AutoCAD_DXF) files and renders Virtual Reality using [A-Frame 0.8.0](https://aframe.io) library.
 
 ### What does PYMba mean?
 
@@ -32,7 +32,7 @@ Okay, now publish and go to the frontend to see how your model behaves.
 
 ### Interaction
 
-The model window is embedded within your website, but you can go fullscreen by pressing `F` or the visor icon in the right bottom corner of the window. On some mobiles the image will be split in two, with stereoscopic effect. You will need one of those cardboard headgears to appreciate the effect. Press `ESC` to exit fullscreen mode. On laptops, if you want to look around, you have to press and drag the mouse. To move around press the `W-A-S-D` keys. On some mobiles you literally walk to explore the model, but I've never experienced that. 
+The model window is embedded within your website, but you can go fullscreen by pressing `F` or the visor icon in the right bottom corner of the window. On some mobiles the image will be split in two, with stereoscopic effect. You will need one of those cardboard headgears to appreciate the effect. Press `ESC` to exit fullscreen mode. On laptops, if you want to look around, you have to press and drag the mouse. To move around press the `W-A-S-D` keys. On some mobiles you literally walk to explore the model, but I've never experienced that. Some elements like Doors have animations, just click on them.
 Last but not least, press the `Ctrl+Alt+I` to enter the Inspector mode, that makes you inspect and modify the entities of the model. Modifications can be saved to HTML files.
 
 ### Standard blocks
@@ -51,7 +51,7 @@ Link standard block allows you to link different pages on a click. The `Tree` at
 
 ### BIM standard blocks
 
-BIM standard blocks are recognized as real life building elements. By now we have only `Wall` and `Slab` BIM elements, `Doors` are under development. If you put a Door inside a Wall, you get a `Openwall`. These blocks behave pretty much as a box, but attributes are different: we can set a `Type` for each wall/slab and a `Finishing` for each side.
+BIM standard blocks are recognized as real life building elements. By now we have only `Wall`, `Slab` and `Door` BIM elements. If you put a Door inside a Wall, you get a `Openwall`. Partition blocks behave pretty much as a box, but attributes are different: we can set a `Type` for each wall/slab and a `Finishing` for each side.
 
 Wall and Slab types are defined in the backend as `PYMba Pertition Pages`, and must be children of the `Pymba Page` they are related to. Creating a new partition type requires `Title`, `Intro`, `Image` (is it a `pattern`?) and `Color`. You can then add as many wall `Layers` to the Partition Type as you want. Layers require a `Material`, a `Thickness` (in centimeters) and a `Weight` in kilograms per cubic meter.
 First layer is innermost for Walls and uppermost for Slabs. The app controls if wall/slab dimensions in CAD are consistent with Partition Type features, i.e. wall/slab thickness. If inconsistency arises, wall/slab is rendered in flat red. You can leave a layer with zero thickness to assign the same Partition Type to blocks with different depth.
@@ -62,4 +62,4 @@ BIM element data is stored in a `CSV` file downloadable from the frontend. Data 
 
 ### Next improvements
 
-Door and Open wall blocks.
+Double and sliding door animations.
