@@ -185,8 +185,8 @@ def make_html(self_page, collection, partitions, finishings, csv_f):
     output = {}
     for x, data in collection.items():
 
-        if data['2'] == '3dface':#left for legacy
-            output[x] = make_triangle(x, data)
+        if data['2'] == '3dface':
+            output[x] = make_triangle(self_page, x, data)
 
         if data['2'] == '6planes':#left for legacy
             output[x] = make_box(x, data)
@@ -218,7 +218,7 @@ def make_html(self_page, collection, partitions, finishings, csv_f):
             output[x] = make_plane(x, data)
 
         elif data['2'] == 'light' or data['2'] == 'a-light':
-            output[x] = make_light(x, data)
+            output[x] = make_light(self_page, x, data)
 
         elif data['2'] == 'a-text':
             output[x] = make_text(x, data)
@@ -545,18 +545,18 @@ def make_link(self_page, x, data):
     else:
         return ''
 
-def make_triangle(x, data):
+def make_triangle(self_page, x, data):
     outstr = f'<a-triangle id="triangle-{x}" \n'
     outstr += f'geometry="vertexA:{data["10"]} {data["30"]} {data["20"]}; \n'
     outstr += f'vertexB:{data["11"]} {data["31"]} {data["21"]}; \n'
     outstr += f'vertexC:{data["12"]} {data["32"]} {data["22"]}" \n'
     outstr += f'material="src: #image-{data["8"]}; color: {data["color"]}; '
-    if self.double_face:
+    if self_page.double_face:
         outstr += 'side: double; '
     outstr += '">\n</a-triangle> \n'
     return outstr
 
-def make_light(x, data):
+def make_light(self_page, x, data):
     outstr = f'<a-entity id="light-{x}" \n'
     outstr += f'position="{data["10"]} {data["30"]} {data["20"]}" \n'
     outstr += f'rotation="{data["210"]} {data["50"]} {data["220"]}"\n'
@@ -567,26 +567,26 @@ def make_light(x, data):
         elif data['type'] == 'point':
             outstr += f'light="type: point; color: {data["color"]}; intensity: {data["intensity"]}; '
             outstr += f'decay: {data["decay"]}; distance: {data["distance"]}; '
-            if self.shadows:
+            if self_page.shadows:
                 outstr += 'castShadow: true; '
             outstr += '"> \n</a-entity>\n'#close light entity
         elif data['type'] == 'spot':
             outstr += f'light="type: spot; color: {data["color"]}; intensity: {data["intensity"]}; '
             outstr += f'decay: {data["decay"]}; distance: {data["distance"]}; '
             outstr += f'angle: {data["angle"]}; penumbra: {data["penumbra"]}; '
-            if self.shadows:
+            if self_page.shadows:
                 outstr += 'castShadow: true; '
             outstr += f'target: #light-{x}-target;"> \n'
             outstr += f'<a-entity id="light-{x}-target" position="0 -1 0"> </a-entity> \n</a-entity> \n'#close light entity
         else:#defaults to directional
             outstr += f'light="type: directional; color: {data["color"]}; intensity: {data["intensity"]}; '
-            if self.shadows:
+            if self_page.shadows:
                 outstr += 'castShadow: true; '
             outstr += f'target: #light-{x}-target;"> \n'
             outstr += f'<a-entity id="light-{x}-target" position="0 -1 0"> </a-entity> \n</a-entity> \n'#close light entity
     except KeyError:#default if no light type is set
         outstr += 'light="type: point; intensity: 0.75; distance: 50; decay: 2; '
-        if self.shadows:
+        if self_page.shadows:
             outstr += 'castShadow: true;'
         outstr += '">\n</a-entity>\n'#close light entity
     return outstr
