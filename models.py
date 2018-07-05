@@ -7,12 +7,12 @@ from django.conf import settings
 
 from modelcluster.fields import ParentalKey
 
-from wagtail.wagtailcore.models import Page, Orderable
-from wagtail.wagtailadmin.edit_handlers import FieldPanel, InlinePanel, MultiFieldPanel
-from wagtail.wagtailimages.edit_handlers import ImageChooserPanel
-from wagtail.wagtailsearch import index
-from wagtail.wagtaildocs.models import Document
-from wagtail.wagtaildocs.edit_handlers import DocumentChooserPanel
+from wagtail.core.models import Page, Orderable
+from wagtail.admin.edit_handlers import FieldPanel, InlinePanel, MultiFieldPanel
+from wagtail.images.edit_handlers import ImageChooserPanel
+from wagtail.search import index
+from wagtail.documents.models import Document
+from wagtail.documents.edit_handlers import DocumentChooserPanel
 
 class PymbaFinishingPage(Page):
     intro = models.CharField(max_length=250, null=True, blank=True, help_text="Finishing description",)

@@ -180,13 +180,13 @@ def parse_dxf(dxf_f, material_gallery):
 
     return output
 
-def make_html(self_page, collection, partitions, finishings, csv_f):
+def make_html(page_obj, collection, partitions, finishings, csv_f):
 
     output = {}
     for x, data in collection.items():
 
         if data['2'] == '3dface':
-            output[x] = make_triangle(self_page, x, data)
+            output[x] = make_triangle(page_obj, x, data)
 
         if data['2'] == '6planes':#left for legacy
             output[x] = make_box(x, data)
@@ -218,13 +218,13 @@ def make_html(self_page, collection, partitions, finishings, csv_f):
             output[x] = make_plane(x, data)
 
         elif data['2'] == 'light' or data['2'] == 'a-light':
-            output[x] = make_light(self_page, x, data)
+            output[x] = make_light(page_obj, x, data)
 
         elif data['2'] == 'a-text':
             output[x] = make_text(x, data)
 
         elif data['2'] == 'a-link':
-            output[x] = make_link(self_page, x, data)
+            output[x] = make_link(page_obj, x, data)
 
         elif data['2'] == 'a-door':
             door = AOpening(data, partitions, finishings, csv_f)
@@ -519,19 +519,19 @@ def make_text(x, data):
     outstr += '">\n</a-entity>\n'
     return outstr
 
-def make_link(self_page, x, data):
+def make_link(page_obj, x, data):
     outstr = f'<a-link id="link-{x}" \n'
     outstr += f'position="{data["10"]} {data["30"]} {data["20"]}" \n'
     outstr += f'rotation="{data["210"]} {data["50"]} {data["220"]}"\n'
     outstr += f'scale="{data["41"]} {data["43"]} {data["42"]}"\n'
     if data['tree'] == 'parent':
-        target = self_page.get_parent()
+        target = page_obj.get_parent()
     elif data['tree'] == 'child':
-        target = self_page.get_first_child()
+        target = page_obj.get_first_child()
     elif data['tree'] == 'previous' or data['tree'] == 'prev':
-        target = self_page.get_prev_sibling()
+        target = page_obj.get_prev_sibling()
     else:#we default to next sibling
-        target = self_page.get_next_sibling()
+        target = page_obj.get_next_sibling()
     if target:
         outstr += f'href="{target.url}"\n'
         outstr += f'title="{data["title"]}" color="{data["color"]}" on="click"\n'
@@ -545,18 +545,18 @@ def make_link(self_page, x, data):
     else:
         return ''
 
-def make_triangle(self_page, x, data):
+def make_triangle(page_obj, x, data):
     outstr = f'<a-triangle id="triangle-{x}" \n'
     outstr += f'geometry="vertexA:{data["10"]} {data["30"]} {data["20"]}; \n'
     outstr += f'vertexB:{data["11"]} {data["31"]} {data["21"]}; \n'
     outstr += f'vertexC:{data["12"]} {data["32"]} {data["22"]}" \n'
     outstr += f'material="src: #image-{data["8"]}; color: {data["color"]}; '
-    if self_page.double_face:
+    if page_obj.double_face:
         outstr += 'side: double; '
     outstr += '">\n</a-triangle> \n'
     return outstr
 
-def make_light(self_page, x, data):
+def make_light(page_obj, x, data):
     outstr = f'<a-entity id="light-{x}" \n'
     outstr += f'position="{data["10"]} {data["30"]} {data["20"]}" \n'
     outstr += f'rotation="{data["210"]} {data["50"]} {data["220"]}"\n'
@@ -567,26 +567,26 @@ def make_light(self_page, x, data):
         elif data['type'] == 'point':
             outstr += f'light="type: point; color: {data["color"]}; intensity: {data["intensity"]}; '
             outstr += f'decay: {data["decay"]}; distance: {data["distance"]}; '
-            if self_page.shadows:
+            if page_obj.shadows:
                 outstr += 'castShadow: true; '
             outstr += '"> \n</a-entity>\n'#close light entity
         elif data['type'] == 'spot':
             outstr += f'light="type: spot; color: {data["color"]}; intensity: {data["intensity"]}; '
             outstr += f'decay: {data["decay"]}; distance: {data["distance"]}; '
             outstr += f'angle: {data["angle"]}; penumbra: {data["penumbra"]}; '
-            if self_page.shadows:
+            if page_obj.shadows:
                 outstr += 'castShadow: true; '
             outstr += f'target: #light-{x}-target;"> \n'
             outstr += f'<a-entity id="light-{x}-target" position="0 -1 0"> </a-entity> \n</a-entity> \n'#close light entity
         else:#defaults to directional
             outstr += f'light="type: directional; color: {data["color"]}; intensity: {data["intensity"]}; '
-            if self_page.shadows:
+            if page_obj.shadows:
                 outstr += 'castShadow: true; '
             outstr += f'target: #light-{x}-target;"> \n'
             outstr += f'<a-entity id="light-{x}-target" position="0 -1 0"> </a-entity> \n</a-entity> \n'#close light entity
     except KeyError:#default if no light type is set
         outstr += 'light="type: point; intensity: 0.75; distance: 50; decay: 2; '
-        if self_page.shadows:
+        if page_obj.shadows:
             outstr += 'castShadow: true;'
         outstr += '">\n</a-entity>\n'#close light entity
     return outstr
@@ -595,11 +595,12 @@ class APartition(object):
     def __init__(self, data, types, finishings, csv_f):
         self.d = data#is it possible to use the self.__dict__=data construct? it would be much cleaner
         self.d['alert'] = 'None'
+        self.type_obj = False
         if self.d['type']:
             try:
                 self.type_obj = types.get(title = self.d['type'])
             except:
-                self.type_obj = False
+                pass
         self.finishings = finishings
         self.csv_f = csv_f
 
@@ -1023,15 +1024,16 @@ class APartition(object):
         outstr += '</a-entity>\n'
         return outstr
 
-class AOpening(object):
+class AOpening(object):#face it, this could be a APartition subclass
     def __init__(self, data, types, finishings, csv_f):
         self.d = data#is it possible to use the self.__dict__=data construct? it would be much cleaner
         self.d['alert'] = 'None'
+        self.type_obj = False
         if self.d['type']:
             try:
                 self.type_obj = types.get(title = self.d['type'])
             except:
-                self.type_obj = False
+                pass
         self.finishings = finishings
         self.csv_f = csv_f
 
