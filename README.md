@@ -1,6 +1,6 @@
 # PYMba
 
-A basic BIM as a [Django 1.11.4](https://www.djangoproject.com/) / [Wagtail 1.12](https://wagtail.io/) app that imports [CAD](https://en.wikipedia.org/wiki/AutoCAD_DXF) files and renders Virtual Reality using [A-Frame 0.8.0](https://aframe.io) library.
+A basic BIM as a [Django 2.0.2](https://www.djangoproject.com/) / [Wagtail 2.0](https://wagtail.io/) app that imports [CAD](https://en.wikipedia.org/wiki/AutoCAD_DXF) files and renders Virtual Reality using [A-Frame 0.8.0](https://aframe.io) library.
 
 ### What does PYMba mean?
 
