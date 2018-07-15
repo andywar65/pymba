@@ -4,8 +4,8 @@
 
 
         {% block extra_css %}
-            <script type="text/javascript" src="{% static 'js/aframe.min.js' %}"></script>
-            <script type="text/javascript" src="{% static 'js/aframe-look-at-component.min.js' %}"></script>
+            <script type="text/javascript" src="{% static 'pymba/js/aframe.min.js' %}"></script>
+            <script type="text/javascript" src="{% static 'pymba/js/aframe-look-at-component.min.js' %}"></script>
         {% endblock %}
 
 {% block body_class %}template-pymbafinishingpage{% endblock %}
@@ -13,7 +13,7 @@
 {% block content %}
         <a-scene style="width: 100%; height: 768px" embedded>
           <a-assets>
-			   <img id="sky" src="{% static 'images/target.png' %}">
+			   <img id="sky" src="{% static 'pymba/images/target.png' %}">
 			{% with wall_image=page.image %}
 			 {% if wall_image %}
 			  {% image wall_image original as temp_image %}
