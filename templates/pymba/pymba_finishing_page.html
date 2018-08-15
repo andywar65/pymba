@@ -2,15 +2,11 @@
 {% load static wagtailuserbar %}
 {% load wagtailcore_tags wagtailimages_tags %}
 
-
-        {% block extra_css %}
-            <script type="text/javascript" src="{% static 'pymba/js/aframe.min.js' %}"></script>
-            <script type="text/javascript" src="{% static 'pymba/js/aframe-look-at-component.min.js' %}"></script>
-        {% endblock %}
-
 {% block body_class %}template-pymbafinishingpage{% endblock %}
 
 {% block content %}
+            <script type="text/javascript" src="{% static 'pymba/js/aframe.min.js' %}"></script>
+            <script type="text/javascript" src="{% static 'pymba/js/aframe-look-at-component.min.js' %}"></script>
         <a-scene style="width: 100%; height: 768px" embedded>
           <a-assets>
 			   <img id="sky" src="{% static 'pymba/images/target.png' %}">
