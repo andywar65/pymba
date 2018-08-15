@@ -203,3 +203,30 @@ class PymbaPageMaterialImage(Orderable):
         FieldPanel('pattern'),
         FieldPanel('color'),
     ]
+
+class PymbaIndexPage(Page):
+    introduction = models.TextField(
+        help_text='Text to describe the page',
+        blank=True)
+
+    content_panels = Page.content_panels + [
+        FieldPanel('introduction', classname="full"),
+    ]
+
+    # Speficies that only PymbaPage objects can live under this index page
+    subpage_types = ['PymbaPage']
+
+    # Defines a method to access the children of the page (e.g. PymbaPage
+    # objects).
+    def children(self):
+        return self.get_children().specific().live()
+
+    # Overrides the context to list all child items, that are live, by the
+    # date that they were published
+    # http://docs.wagtail.io/en/latest/getting_started/tutorial.html#overriding-context
+    def get_context(self, request):
+        context = super(PymbaIndexPage, self).get_context(request)
+        context['posts'] = PymbaPage.objects.descendant_of(
+            self).live().order_by(
+            '-date_published')
+        return context
