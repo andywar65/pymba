@@ -228,5 +228,5 @@ class PymbaIndexPage(Page):
         context = super(PymbaIndexPage, self).get_context(request)
         context['posts'] = PymbaPage.objects.descendant_of(
             self).live().order_by(
-            '-date_published')
+            '-first_published_at')
         return context
