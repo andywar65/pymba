@@ -30,6 +30,8 @@ Then load the most important stuff: the DXF file. It will be stored in the `medi
 
 Okay, now publish and go to the frontend to see how your model behaves.
 
+When you have several `Pymba Pages` you can collect them under a `Pymba Index Page`. This page acts like a blog index. Style is borrowed by the [Bakery](https://github.com/wagtail/bakerydemo) CSS.
+
 ### Interaction
 
 The model window is embedded within your website, but you can go fullscreen by pressing `F` or the visor icon in the right bottom corner of the window. On some mobiles the image will be split in two, with stereoscopic effect. You will need one of those cardboard headgears to appreciate the effect. Press `ESC` to exit fullscreen mode. On laptops, if you want to look around, you have to press and drag the mouse. To move around press the `W-A-S-D` keys. On some mobiles you literally walk to explore the model, but I've never experienced that. Some elements like Doors have animations, just click on them.
