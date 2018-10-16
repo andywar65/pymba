@@ -304,11 +304,11 @@ def door_straight_case(x, data, data2):
                 xmaxd = xd
                 xmind = xde
             if zde > zd:
-                zmaxd = zde
-                zmind = zd
+                zmaxd = zde * ( - backwards)
+                zmind = zd * ( - backwards)
             else:
-                zmaxd = zd
-                zmind = zde
+                zmaxd = zd * ( - backwards)
+                zmind = zde * ( - backwards)
             #door inclusion
             if xmaxw >= xmaxd and xminw <= xmind and zmaxw >= zmaxd and zminw <= zmind:
                 data2['door'] = x
