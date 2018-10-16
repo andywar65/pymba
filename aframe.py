@@ -636,13 +636,13 @@ class APartition(object):
                 self.d['color'] = self.type_obj.color
 
         #writing to csv file
-        self.csv_f.write(f'{self.d["num"]},{self.d["layer"]},{self.d["2"]},{self.type_obj.title},-,{self.d["10"]},{-self.d["20"]},{self.d["30"]},')
+        self.csv_f.write(f'{self.d["num"]},{self.d["layer"]},{self.d["2"]},-,-,{self.type_obj.title},{self.d["10"]},{-self.d["20"]},{self.d["30"]},')
         self.csv_f.write(f'{self.d["210"]},{-self.d["220"]},{self.d["50"]},{self.d["41"]},{self.d["42"]},{self.d["43"]},{part_weight},{self.d["alert"]} \n')
         return
 
     def no_weight(self):
         #writing to csv file
-        self.csv_f.write(f'{self.d["num"]},{self.d["layer"]},{self.d["2"]},None,-,{self.d["10"]},{-self.d["20"]},{self.d["30"]},')
+        self.csv_f.write(f'{self.d["num"]},{self.d["layer"]},{self.d["2"]},-,-,None,{self.d["10"]},{-self.d["20"]},{self.d["30"]},')
         self.csv_f.write(f'{self.d["210"]},{-self.d["220"]},{self.d["50"]},{self.d["41"]},{self.d["42"]},{self.d["43"]},0,{self.d["alert"]} \n')
         return
 
@@ -906,7 +906,7 @@ class APartition(object):
             else:
                 part_color = self.d['color']
 
-            self.csv_f.write(f'{self.d["num"]},{self.d["layer"]},{self.d["2"]}/{self.d["sub_side"]},{part_image},-,-,-,-,-,-,-,{self.d["width"]},{self.d["height"]},-,-,- \n')
+            self.csv_f.write(f'{self.d["num"]},{self.d["layer"]},{self.d["2"]},{self.d["sub_side"]},-,{part_image},-,-,-,-,-,-,-,{self.d["width"]},{self.d["height"]},-,-,- \n')
         except:
             part_image = self.d['8']
             part_repeat = self.d['repeat']
@@ -966,7 +966,7 @@ class APartition(object):
             outstr += f'material="src: #image-{wall_image}; color: {wall_color}'
             outstr += is_repeat(wall_repeat, self.d['width'], wall_height)
             outstr += '">\n</a-plane> \n'
-            self.csv_f.write(f'{self.d["num"]},{self.d["layer"]},{self.d["2"]}/{self.d["sub_side"]},{wall_image},Wall,-,-,-,-,-,-,{self.d["width"]},{wall_height},-,-,- \n')
+            self.csv_f.write(f'{self.d["num"]},{self.d["layer"]},{self.d["2"]},{self.d["sub_side"]},Wall,{finishing.title},-,-,-,-,-,-,{self.d["width"]},{wall_height},-,-,- \n')
             if tiling_height:
                 outstr += f'<a-plane id="{self.d["2"]}-{self.d["num"]}-{self.d["sub_side"]}-tiling" \n'
                 outstr += f'position="0 {tiling_height/2+skirting_height} 0" \n'
@@ -974,7 +974,7 @@ class APartition(object):
                 outstr += f'material="src: #image-tiling-{finishing.title}; color: {finishing.tiling_color}'
                 outstr += is_repeat(finishing.tiling_pattern, self.d['width'], tiling_height)
                 outstr += '">\n</a-plane> \n'
-                self.csv_f.write(f'{self.d["num"]},{self.d["layer"]},{self.d["2"]}/{self.d["sub_side"]},{finishing.title},Tiling,-,-,-,-,-,-,{self.d["width"]},{tiling_height},-,-,- \n')
+                self.csv_f.write(f'{self.d["num"]},{self.d["layer"]},{self.d["2"]},{self.d["sub_side"]},Tiling,{finishing.title},-,-,-,-,-,-,{self.d["width"]},{tiling_height},-,-,- \n')
             if skirting_height:
                 outstr += f'<a-plane id="{self.d["2"]}-{self.d["num"]}-{self.d["sub_side"]}-skirting" \n'
                 outstr += f'position="0 {skirting_height/2} 0" \n'
@@ -982,7 +982,7 @@ class APartition(object):
                 outstr += f'material="src: #image-skirting-{finishing.title}; color: {finishing.skirting_color}'
                 outstr += is_repeat(finishing.skirting_pattern, self.d['width'], skirting_height)
                 outstr += '">\n</a-plane> \n'
-                self.csv_f.write(f'{self.d["num"]},{self.d["layer"]},{self.d["2"]}/{self.d["sub_side"]},{finishing.title},Skirting,-,-,-,-,-,-,{self.d["width"]},{skirting_height},-,-,- \n')
+                self.csv_f.write(f'{self.d["num"]},{self.d["layer"]},{self.d["2"]},{self.d["sub_side"]},Skirting,{finishing.title},-,-,-,-,-,-,{self.d["width"]},{skirting_height},-,-,- \n')
         except:
             outstr = f'<a-plane id="{self.d["2"]}-{self.d["num"]}-{self.d["sub_side"]}" \n'
             outstr += f'position="0 {(self.d["height"]-door_height)/2} 0" \n'
@@ -1050,13 +1050,13 @@ class AOpening(object):#face it, this could be a APartition subclass
             self.d['color'] = self.type_obj.color
         #writing to csv file
         opening_weight = 0#by now useless
-        self.csv_f.write(f'{self.d["num"]},{self.d["layer"]},{self.d["2"]},{self.type_obj.title},-,{self.d["10"]},{-self.d["20"]},{self.d["30"]},')
+        self.csv_f.write(f'{self.d["num"]},{self.d["layer"]},{self.d["2"]},-,-,{self.type_obj.title},{self.d["10"]},{-self.d["20"]},{self.d["30"]},')
         self.csv_f.write(f'{self.d["210"]},{-self.d["220"]},{self.d["50"]},{self.d["41"]},{self.d["42"]},{self.d["43"]},{opening_weight},{self.d["alert"]} \n')
         return
 
     def no_type(self):
         #writing to csv file
-        self.csv_f.write(f'{self.d["num"]},{self.d["layer"]},{self.d["2"]},None,-,{self.d["10"]},{-self.d["20"]},{self.d["30"]},')
+        self.csv_f.write(f'{self.d["num"]},{self.d["layer"]},{self.d["2"]},-,-,None,{self.d["10"]},{-self.d["20"]},{self.d["30"]},')
         self.csv_f.write(f'{self.d["210"]},{-self.d["220"]},{self.d["50"]},{self.d["41"]},{self.d["42"]},{self.d["43"]},0,{self.d["alert"]} \n')
         return
 

@@ -17,10 +17,10 @@ from wagtail.documents.edit_handlers import DocumentChooserPanel
 class PymbaFinishingPage(Page):
     intro = models.CharField(max_length=250, null=True, blank=True, help_text="Finishing description",)
     image = models.ForeignKey(
-        'wagtailimages.Image', 
+        'wagtailimages.Image',
         null=True,
         blank=True,
-        on_delete = models.SET_NULL, 
+        on_delete = models.SET_NULL,
         related_name = '+',
         help_text="Sets the finishing general appearance",
         )
@@ -28,10 +28,10 @@ class PymbaFinishingPage(Page):
     color = models.CharField(max_length=250, null=True, blank=True, help_text="Accepts hex (#ffffff) or HTML color",)
     tiling_height = models.CharField(max_length=250, default="0", help_text="Tiling height from floor in cm",)
     tiling_image = models.ForeignKey(
-        'wagtailimages.Image', 
+        'wagtailimages.Image',
         null=True,
         blank=True,
-        on_delete = models.SET_NULL, 
+        on_delete = models.SET_NULL,
         related_name = '+',
         help_text="Sets the tiling general appearance",
         )
@@ -39,10 +39,10 @@ class PymbaFinishingPage(Page):
     tiling_color = models.CharField(max_length=250, default="white", help_text="Accepts hex (#ffffff) or HTML color",)
     skirting_height = models.CharField(max_length=250, default="0", help_text="Skirting height from in cm",)
     skirting_image = models.ForeignKey(
-        'wagtailimages.Image', 
+        'wagtailimages.Image',
         null=True,
         blank=True,
-        on_delete = models.SET_NULL, 
+        on_delete = models.SET_NULL,
         related_name = '+',
         help_text="Sets the skirting general appearance",
         )
@@ -77,10 +77,10 @@ class PymbaFinishingPage(Page):
 class PymbaPartitionPage(Page):
     intro = models.CharField(max_length=250, null=True, blank=True, help_text="Partition description",)
     image = models.ForeignKey(
-        'wagtailimages.Image', 
+        'wagtailimages.Image',
         null=True,
         blank=True,
-        on_delete = models.SET_NULL, 
+        on_delete = models.SET_NULL,
         related_name = '+',
         help_text="Sets the partition general appearance",
         )
@@ -116,16 +116,16 @@ class PymbaPartitionPageLayers(Orderable):
 class PymbaPage(Page):
     intro = models.CharField(max_length=250, null=True, blank=True, help_text="Project description",)
     equirectangular_image = models.ForeignKey(
-        'wagtailimages.Image', 
+        'wagtailimages.Image',
         null=True,
         blank=True,
-        on_delete = models.SET_NULL, 
+        on_delete = models.SET_NULL,
         related_name = '+',
         help_text="Landscape surrounding your project",
         )
     dxf_file = models.ForeignKey(
-        'wagtaildocs.Document', 
-        null=True, 
+        'wagtaildocs.Document',
+        null=True,
         on_delete = models.SET_NULL,
         related_name = '+',
         help_text="CAD file of your project",
@@ -170,7 +170,7 @@ class PymbaPage(Page):
 
         path_to_csv = os.path.join(settings.MEDIA_ROOT, 'documents', self.slug + '.csv')
         csv_f = open(path_to_csv, 'w', encoding = 'utf-8',)
-        csv_f.write('Num,Layer,Block/Side,Type,Finishing,X,Y,Z,Rx,Ry,Rz,Width,Depth,Height,Weight, Alert \n')
+        csv_f.write('Elem,Layer,Block,Surf,Strip,Type,X,Y,Z,Rx,Ry,Rz,Width,Depth,Height,Weight, Alert \n')
 
         partitions = PymbaPartitionPage.objects#how can I restrict to children?TO DO
         finishings = PymbaFinishingPage.objects#how can I restrict to children?TO DO
@@ -186,10 +186,10 @@ class PymbaPage(Page):
 class PymbaPageMaterialImage(Orderable):
     page = ParentalKey(PymbaPage, related_name='material_images')
     image = models.ForeignKey(
-        'wagtailimages.Image', 
+        'wagtailimages.Image',
         null=True,
         blank=True,
-        on_delete = models.SET_NULL, 
+        on_delete = models.SET_NULL,
         related_name = '+',
         help_text="Sets general appearance of material",
     )
