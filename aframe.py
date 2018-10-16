@@ -1067,25 +1067,24 @@ class AOpening(object):#face it, this could be a APartition subclass
         outstr += f'rotation="{self.d["210"]} {self.d["50"]} {self.d["220"]}">\n'
         #left frame
         outstr += f'<a-box id="{self.d["2"]}-{self.d["num"]}-left-frame" \n'
-        outstr += f'position="{-0.049*self.unit(self.d["41"])} {(self.d["43"]+0.099*self.unit(self.d["43"]))/2} {self.d["42"]/2}" \n'
+        outstr += f'position="{-0.049*self.unit(self.d["41"])} {(self.d["43"]+0.099*self.unit(self.d["43"]))/2} {-self.d["42"]/2}" \n'
         outstr += f'scale="0.1 {fabs(self.d["43"])+0.099} {fabs(self.d["42"])+0.02}" \n'
         outstr += f'material="color: {self.d["color"]}">'
         outstr += '</a-box>\n'
         #right frame
         outstr += f'<a-box id="{self.d["2"]}-{self.d["num"]}-right-frame" \n'
-        outstr += f'position="{self.d["41"]+0.049*self.unit(self.d["41"])} {(self.d["43"]+0.099*self.unit(self.d["43"]))/2} {self.d["42"]/2}" \n'
+        outstr += f'position="{self.d["41"]+0.049*self.unit(self.d["41"])} {(self.d["43"]+0.099*self.unit(self.d["43"]))/2} {-self.d["42"]/2}" \n'
         outstr += f'scale="0.1 {fabs(self.d["43"])+0.099} {fabs(self.d["42"])+0.02}" \n'
         outstr += f'material="color: {self.d["color"]}">'
         outstr += '</a-box>\n'
         #top frame
         outstr += f'<a-box id="{self.d["2"]}-{self.d["num"]}-top-frame" \n'
-        outstr += f'position="{self.d["41"]/2} {self.d["43"]+0.049*self.unit(self.d["43"])} {self.d["42"]/2}" \n'
+        outstr += f'position="{self.d["41"]/2} {self.d["43"]+0.049*self.unit(self.d["43"])} {-self.d["42"]/2}" \n'
         outstr += f'scale="{fabs(self.d["41"])-0.002} 0.1 {fabs(self.d["42"])+0.02}" \n'
         outstr += f'material="color: {self.d["color"]}">'
         outstr += '</a-box>\n'
         #animated hinge
-        outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-hinge" \n'
-        outstr += f'position="0 0 {self.d["42"]}"> \n'
+        outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-hinge"> \n'
         outstr += f'<a-animation attribute="rotation" from="0 0 0" to="0 {-90*self.unit(self.d["41"])*self.unit(self.d["42"])} 0" begin="click" repeat="1" direction="alternate"></a-animation>'
         #moving part
         outstr += f'<a-box id="{self.d["2"]}-{self.d["num"]}-moving-part" \n'
