@@ -37,7 +37,7 @@ class PymbaFinishingPage(Page):
         )
     tiling_pattern = models.BooleanField(default=False,  help_text="Is it a 1x1 meter pattern?",)
     tiling_color = models.CharField(max_length=250, default="white", help_text="Accepts hex (#ffffff) or HTML color",)
-    skirting_height = models.CharField(max_length=250, default="0", help_text="Skirting height from in cm",)
+    skirting_height = models.CharField(max_length=250, default="0", help_text="Skirting height from floor in cm",)
     skirting_image = models.ForeignKey(
         'wagtailimages.Image',
         null=True,
