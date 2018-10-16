@@ -811,7 +811,7 @@ class APartition(object):
 
             outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-{self.d["sub_side"]}-ent" \n'
             outstr += f'position="{self.d["door_off_1"]/2} 0 0" \n'
-            if self.d['42'] > 0:
+            if self.d['42'] < 0:
                 outstr += 'rotation="0 180 0"> \n'
             else:
                 outstr += '> \n'
@@ -825,7 +825,7 @@ class APartition(object):
 
             outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-{self.d["sub_side"]}-ent" \n'
             outstr += f'position="{self.d["width"]/2+self.d["door_off_2"]} 0 0" \n'
-            if self.d['42'] > 0:
+            if self.d['42'] < 0:
                 outstr += 'rotation="0 180 0"> \n'
             else:
                 outstr += '> \n'
@@ -839,7 +839,7 @@ class APartition(object):
 
             outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-{self.d["sub_side"]}-ent" \n'
             outstr += f'position="{self.d["width"]/2} {self.d["door_height"]} 0" \n'
-            if self.d['42'] > 0:
+            if self.d['42'] < 0:
                 outstr += 'rotation="0 180 0"> \n'
             else:
                 outstr += '> \n'
@@ -852,8 +852,8 @@ class APartition(object):
             self.d['height'] = fabs(self.d['door_height'])
 
             outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-{self.d["sub_side"]}-ent" \n'
-            outstr += f'position="{self.d["door_off_1"]/2} 0 {self.d["42"]}" \n'
-            if self.d['42'] < 0:
+            outstr += f'position="{self.d["door_off_1"]/2} 0 {-self.d["42"]}" \n'
+            if self.d['42'] > 0:
                 outstr += 'rotation="0 180 0"> \n'
             else:
                 outstr += '> \n'
@@ -866,8 +866,8 @@ class APartition(object):
             self.d['height'] = fabs(self.d['door_height'])
 
             outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-{self.d["sub_side"]}-ent" \n'
-            outstr += f'position="{self.d["width"]/2+self.d["door_off_2"]} 0 {self.d["42"]}" \n'
-            if self.d['42'] < 0:
+            outstr += f'position="{self.d["width"]/2+self.d["door_off_2"]} 0 {-self.d["42"]}" \n'
+            if self.d['42'] > 0:
                 outstr += 'rotation="0 180 0"> \n'
             else:
                 outstr += '> \n'
@@ -880,8 +880,8 @@ class APartition(object):
             self.d['height'] = fabs(self.d['43'])
 
             outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-{self.d["sub_side"]}-ent" \n'
-            outstr += f'position="{self.d["width"]/2} {self.d["door_height"]} {self.d["42"]}" \n'
-            if self.d['42'] < 0:
+            outstr += f'position="{self.d["width"]/2} {self.d["door_height"]} {-self.d["42"]}" \n'
+            if self.d['42'] > 0:
                 outstr += 'rotation="0 180 0"> \n'
             else:
                 outstr += '> \n'
