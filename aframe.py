@@ -1084,11 +1084,12 @@ class AOpening(object):#face it, this could be a APartition subclass
         outstr += f'material="color: {self.d["color"]}">'
         outstr += '</a-box>\n'
         #animated hinge
-        outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-hinge"> \n'
-        outstr += f'<a-animation attribute="rotation" from="0 0 0" to="0 {90*self.unit(self.d["41"])*self.unit(self.d["42"])} 0" begin="click" repeat="1" direction="alternate"></a-animation>'
+        outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-hinge" \n'
+        outstr += f'position="0 0 {self.d["42"]}"> \n'
+        outstr += f'<a-animation attribute="rotation" from="0 0 0" to="0 {-90*self.unit(self.d["41"])*self.unit(self.d["42"])} 0" begin="click" repeat="1" direction="alternate"></a-animation>'
         #moving part
         outstr += f'<a-box id="{self.d["2"]}-{self.d["num"]}-moving-part" \n'
-        outstr += f'position="{self.d["41"]/2} {(self.d["43"]-0.001*self.unit(self.d["43"]))/2} {0.025*self.unit(self.d["42"])}" \n'
+        outstr += f'position="{self.d["41"]/2} {(self.d["43"]-0.001*self.unit(self.d["43"]))/2} {-0.025*self.unit(self.d["42"])}" \n'
         outstr += f'scale="{fabs(self.d["41"])-0.002} {self.d["43"]-0.001*self.unit(self.d["43"])} 0.05" \n'
         outstr += f'material="src: #image-{self.d["8"]}; color: {self.d["color"]}'
         outstr += is_repeat(self.d["repeat"], fabs(self.d["41"])-0.002, self.d["43"]-0.001*self.unit(self.d["43"]))
