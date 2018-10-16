@@ -933,14 +933,18 @@ class APartition(object):
             skirting_height = fabs(float(finishing.skirting_height))/100*self.d['43']/fabs(self.d['43'])
             if fabs(door_height) > fabs(self.d['height']):
                 door_height = self.d['height']
-            if fabs(tiling_height) > fabs(self.d['height']):
                 tiling_height = self.d['height']
-            if fabs(tiling_height) < fabs(door_height):
-                tiling_height = door_height
-            if fabs(skirting_height) > fabs(tiling_height):
-                skirting_height = tiling_height
-            if fabs(skirting_height) < fabs(door_height):
-                skirting_height = door_height
+                skirting_height = self.d['height']
+            else:
+                if fabs(skirting_height) < fabs(door_height):
+                    skirting_height = door_height
+                if fabs(skirting_height) > self.d['height']:
+                    skirting_height = self.d['height']
+                if fabs(tiling_height) < fabs(skirting_height):
+                    tiling_height = skirting_height
+                if fabs(tiling_height) > self.d['height']:
+                    tiling_height = self.d['height']
+
             wall_height = self.d['height'] - tiling_height
             tiling_height = tiling_height - skirting_height
             skirting_height = skirting_height - door_height
