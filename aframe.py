@@ -3,6 +3,7 @@ from math import radians, sin, cos, asin, degrees, pi, sqrt, pow, fabs, atan2
 def parse_dxf(dxf_f, material_gallery):
 
     output = {}
+    layer_color = {}
     flag = False
     x = 0
     value = 'dummy'
@@ -10,7 +11,15 @@ def parse_dxf(dxf_f, material_gallery):
     while value !='ENTITIES':
         key = dxf_f.readline().strip()
         value = dxf_f.readline().strip()
-        if value=='EOF' or key=='':#security to avoid loops if file is corrupted
+        if value == 'AcDbLayerTableRecord':#dict of layer names and colors
+            key = dxf_f.readline().strip()
+            layer_name = dxf_f.readline().strip()
+            key = dxf_f.readline().strip()
+            value = dxf_f.readline().strip()
+            key = dxf_f.readline().strip()
+            layer_color[layer_name] = cad2hex(dxf_f.readline().strip())
+
+        elif value=='EOF' or key=='':#security to avoid loops if file is corrupted
             return output
 
     while value !='ENDSEC':
@@ -1108,3 +1117,31 @@ class AOpening(object):#face it, this could be a APartition subclass
             return output
         else:
             return ';'
+
+def cad2hex(cad_color):
+    cad_color = fabs(float(cad_color))
+    if cad_color<1 or cad_color>19:
+        return 'white'
+    else:
+        translate = {
+        1:'red',
+        2:'yellow',
+        3:'green',
+        4:'cyan',
+        5:'blue',
+        6:'magenta',
+        7:'white',
+        8:'#808080',
+        9:'#c0c0c0',
+        10:'red',
+        11:'#ff7f7f',
+        12:'#cc0000',
+        13:'#cc6666',
+        14:'#990000',
+        15:'#994c4c',
+        16:'#7f0000',
+        17:'#7f3f3f',
+        18:'#4c0000',
+        19:'#4c2626',
+        }
+    return translate[cad_color]
