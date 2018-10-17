@@ -139,8 +139,8 @@ def parse_dxf(dxf_f, material_gallery):
                     material = material_gallery.get(layer = data['8'])
                     data['color'] = material.color
                 except:
+                    data['color'] = layer_color[data['8']]
                     data['8'] = 'default'
-                    data['color'] = 'white'
                 data['num'] = x
                 output[x] = data
 
@@ -170,8 +170,8 @@ def parse_dxf(dxf_f, material_gallery):
                     if material.pattern:# == True
                         data['repeat']=True
                 except:
+                    data['color'] = layer_color[data['8']]
                     data['8'] = 'default'
-                    data['color'] = 'white'
                 data['num'] = x
                 output[x] = data
 
