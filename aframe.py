@@ -131,6 +131,7 @@ def parse_dxf(dxf_f, material_gallery):
                 flag = 'block'#restore block modality
 
         if key == '0':
+            invisible = False#by default layer is visible
 
             if flag == 'face':#close 3D face
                 data['2'] = '3dface'
@@ -138,25 +139,29 @@ def parse_dxf(dxf_f, material_gallery):
                 try:
                     material = material_gallery.get(layer = data['8'])
                     data['color'] = material.color
+                    invisible = material.invisible#layer visibility
                 except:
                     data['color'] = layer_color[data['8']]
                     data['8'] = 'default'
-                data['num'] = x
-                output[x] = data
+                if invisible:
+                    flag = False
+                else:
+                    data['num'] = x
+                    output[x] = data
 
-                if data['12']!=data['13'] or data['22']!=data['23'] or data['32']!=data['33']:
-                    data2 = data.copy()
-                    data2['11'] = data['12']
-                    data2['21'] = data['22']
-                    data2['31'] = data['32']
-                    data2['12'] = data['13']
-                    data2['22'] = data['23']
-                    data2['32'] = data['33']
-                    x += 1
-                    data2['num'] = x
-                    output[x] = data2
+                    if data['12']!=data['13'] or data['22']!=data['23'] or data['32']!=data['33']:
+                        data2 = data.copy()
+                        data2['11'] = data['12']
+                        data2['21'] = data['22']
+                        data2['31'] = data['32']
+                        data2['12'] = data['13']
+                        data2['22'] = data['23']
+                        data2['32'] = data['33']
+                        x += 1
+                        data2['num'] = x
+                        output[x] = data2
 
-                flag = False
+                    flag = False
 
             elif value == 'ATTRIB':#start attribute within block
                 attr_value = ''
@@ -167,15 +172,19 @@ def parse_dxf(dxf_f, material_gallery):
                 try:
                     material = material_gallery.get(layer = data['8'])
                     data['color'] = material.color
+                    invisible = material.invisible#layer visibility
                     if material.pattern:# == True
                         data['repeat']=True
                 except:
                     data['color'] = layer_color[data['8']]
                     data['8'] = 'default'
-                data['num'] = x
-                output[x] = data
+                if invisible:
+                    flag = False
+                else:
+                    data['num'] = x
+                    output[x] = data
 
-                flag = False
+                    flag = False
 
             if value == '3DFACE':#start 3D face
                 data = {}#default values
