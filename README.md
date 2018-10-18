@@ -26,7 +26,7 @@ To include meshes, explode them to 3Dfaces (I know it's bad, but this is how it 
 
 Create a page of the `Pymba Page` kind. You will have to enter a Title and an Intro for the page, and an Equirectangular Image for the background (if none, a default one will be picked). Equirectangular images are like those planispheres where Greenland is bigger than Africa. In the Visual Settings panel you will have to check if you want your shadows on, if you want your camera to be able to fly and if 3D faces must be double sided.
 
-Then load the most important stuff: the DXF file. It will be stored in the `media/documents` folder. After that, you may create as many Material Gallery items as the layers used in the DXF file. Each material needs a Name that must match the layer name (default is `0`), an Image that will be applied to the entity and a Color. If the image is a 1x1 meter pattern, check the appropriate box. Default color is `white`, but you can use hexadecimal notation (like `#ffffff`) or standard HTML colors. Color affects appearance of the image. If you don't add materials, elements will be just white.
+Then load the most important stuff: the DXF file. It will be stored in the `media/documents` folder. After that, you may create as many Material Gallery items as the layers used in the DXF file. Each material needs a Name that must match the layer name (default is `0`), an Image that will be applied to the entity and a Color. If the image is a 1x1 meter pattern, check the appropriate box. Default color is `white`, but you can use hexadecimal notation (like `#ffffff`) or standard HTML colors. Color affects appearance of the image. If you don't add materials, element will inherit the color of the original CAD layer it belongs to. You can set the Material to `Invisible`, and it's like turning the layer off.
 
 Okay, now publish and go to the frontend to see how your model behaves.
 
@@ -66,5 +66,4 @@ BIM element data is stored in a `CSV` file downloadable from the frontend. Data 
 
 ### Next improvements
 
-Elements get original layer color by default.
 Double and sliding door animations.
