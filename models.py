@@ -196,9 +196,11 @@ class PymbaPageMaterialImage(Orderable):
     layer = models.CharField(max_length=250, default="0", help_text="Layer name in CAD file",)
     color = models.CharField(max_length=250, default="white", help_text="Accepts hex (#ffffff) or HTML color",)
     pattern = models.BooleanField(default=False, help_text="Is it a 1x1 meter pattern?",)
+    invisible = models.BooleanField(default=False, help_text="Hide layer?",)
 
     panels = [
         FieldPanel('layer'),
+        FieldPanel('invisible'),
         ImageChooserPanel('image'),
         FieldPanel('pattern'),
         FieldPanel('color'),
