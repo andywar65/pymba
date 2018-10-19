@@ -215,6 +215,9 @@ def make_html(page_obj, collection, partitions, finishings, csv_f):
         elif data['2'] == 'cylinder' or data['2'] == 'a-cylinder':
             output[x] = make_cylinder(x, data)
 
+        elif data['2'] == 'a-curvedimage':
+            output[x] = make_curvedimage(x, data)
+
         elif data['2'] == 'cone' or data['2'] == 'a-cone':
             output[x] = make_cone(x, data)
 
@@ -486,8 +489,8 @@ def make_curvedimage(x, data):
             outstr += f'theta-start="{data["theta-start"]}" '
     except KeyError:
         pass
-    outstr += f'src="#image-{data["8"]}" '
-    outstr += '">\n</a-curvedimage>\n</a-entity>\n'
+    outstr += f'src="#image-{data["8"]}">\n'
+    outstr += '</a-curvedimage>\n</a-entity>\n'
     return outstr
 
 def make_sphere(x, data):
