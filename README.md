@@ -26,7 +26,7 @@ To include meshes, explode them to 3Dfaces (I know it's bad, but this is how it 
 
 Create a page of the `Pymba Page` kind. You will have to enter a Title and an Intro for the page, and an Equirectangular Image for the background (if none, a default one will be picked). Equirectangular images are like those planispheres where Greenland is bigger than Africa. In the Visual Settings panel you will have to check if you want your shadows on, if you want your camera to be able to fly and if 3D faces must be double sided.
 
-Then load the most important stuff: the DXF file. It will be stored in the `media/documents` folder. After that, you may create as many Material Gallery items as the layers used in the DXF file. Each material needs a Name that must match the layer name (default is `0`), an Image that will be applied to the entity and a Color. If the image is a 1x1 meter pattern, check the appropriate box. Default color is `white`, but you can use hexadecimal notation (like `#ffffff`) or standard HTML colors. Color affects appearance of the image. If you don't add materials, element will inherit the color of the original CAD layer it belongs to. You can set the Material to `Invisible`, and it's like turning the layer off.
+Then load the most important stuff: the DXF file. It will be stored in the `media/documents` folder. When elements are rendered, they inherit the original layer color, but you can change that creating as many Material Gallery items as the layers used in the DXF file. Each material needs a Name that must match the layer name (default is `0`), an Image that will be applied to the entity and a Color. If the image is a 1x1 meter pattern, check the appropriate box. Default color is `white`, but you can use hexadecimal notation (like `#ffffff`) or standard HTML colors. Color affects appearance of the image. You can set the Material to `Invisible`, and it's like turning the layer off.
 
 Okay, now publish and go to the frontend to see how your model behaves.
 
@@ -39,7 +39,7 @@ Last but not least, press the `Ctrl+Alt+I` to enter the Inspector mode, that mak
 
 ### Standard blocks
 
-Standard blocks may be found in `static/pymba/samples/standard-blocks.dxf` bundled within the app: box, cylinder, cone, sphere, circle, plane, look-at, text, links and lights. These mimic entities of the A-Frame library, with unit dimensions. Insert the block and scale it to the desired width, length and height. You can rotate it along all axis (previous limitations solved thanks to [Marilena Vendittelli](http://www.dis.uniroma1.it/~venditt/)). You can explode the standard blocks without affecting geometry: they will degrade to a series of 3D faces.
+Standard blocks may be found in `static/pymba/samples/standard-blocks.dxf` bundled within the app: box, cylinder, cone, sphere, circle, plane, look-at, text, links, curvedimage and lights. These mimic entities of the A-Frame library, with unit dimensions. Insert the block and scale it to the desired width, length and height. You can rotate it along all axis (previous limitations solved thanks to [Marilena Vendittelli](http://www.dis.uniroma1.it/~venditt/)). You can explode the standard blocks without affecting geometry: they will degrade to a series of 3D faces.
 
 Standard blocks come with attributes that affect their geometry. In CAD, attributes are prompted when inserting a block, and can be modified in the Property window. To understand how attributes affect geometry, refer to [A-Frame Documentation](https://aframe.io/docs/0.7.0/primitives/a-box.html) .
 
