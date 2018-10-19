@@ -470,6 +470,26 @@ def make_cylinder(x, data):
     outstr += '">\n</a-cylinder>\n</a-entity>\n'
     return outstr
 
+def make_curvedimage(x, data):
+    outstr = f'<a-entity id="curvedimage-{x}-ent" \n'
+    outstr += f'position="{data["10"]} {data["30"]} {data["20"]}" \n'
+    outstr += f'rotation="{data["210"]} {data["50"]} {data["220"]}">\n'
+    outstr += f'<a-curvedimage id="curvedimage-{x}" \n'
+    outstr += f'position="0 {data["43"]/2} 0" \n'
+    if float(data['43']) < 0:
+        outstr += 'rotation="180 0 0">\n'
+    outstr += f'scale="{fabs(data["41"])} {fabs(data["43"])} {fabs(data["42"])}" \n'
+    try:
+        if data['theta-length']!='270':
+            outstr += f'theta-length="{data["theta-length"]}" '
+        if data['theta-start']!='0':
+            outstr += f'theta-start="{data["theta-start"]}" '
+    except KeyError:
+        pass
+    outstr += f'src="#image-{data["8"]}" '
+    outstr += '">\n</a-curvedimage>\n</a-entity>\n'
+    return outstr
+
 def make_sphere(x, data):
     outstr = f'<a-entity id="sphere-{x}-ent" \n'
     outstr += f'position="{data["10"]} {data["30"]} {data["20"]}" \n'
