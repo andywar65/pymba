@@ -1126,23 +1126,59 @@ class AOpening(object):#face it, this could be a APartition subclass
         outstr += '</a-box>\n'
 
         if self.d["type"] == 'ghost':
-            outstr += '</a-entity>\n'
+            outstr += '</a-entity>ghost\n'
             return outstr
         else:
-            #animated hinge
-            outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-hinge"> \n'
-            outstr += f'<a-animation attribute="rotation" from="0 0 0" to="0 {-90*self.unit(self.d["41"])*self.unit(self.d["42"])} 0" begin="click" repeat="1" direction="alternate"></a-animation>'
-            #moving part
-            outstr += f'<a-box id="{self.d["2"]}-{self.d["num"]}-moving-part" \n'
-            outstr += f'position="{self.d["41"]/2} {(self.d["43"]-0.001*self.unit(self.d["43"]))/2} {-0.025*self.unit(self.d["42"])}" \n'
-            outstr += f'scale="{fabs(self.d["41"])-0.002} {self.d["43"]-0.001*self.unit(self.d["43"])} 0.05" \n'
-            outstr += f'material="src: #image-{self.d["8"]}; color: {self.d["color"]}'
-            outstr += is_repeat(self.d["repeat"], fabs(self.d["41"])-0.002, self.d["43"]-0.001*self.unit(self.d["43"]))
-            outstr += '"></a-box>\n'
-            outstr += '</a-entity>\n'
-            #end entity
-            outstr += '</a-entity>\n'
-            return outstr
+            if eval(self.d["sliding"]):
+                if eval(self.d["double"]):
+                    outstr += '</a-entity>sliding double\n'
+                    return outstr
+                else:#single
+                    outstr += '</a-entity>sliding single\n'
+                    return outstr
+            else:#hinged
+                if eval(self.d["double"]):
+                    #animated hinge 1
+                    outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-hinge-1"> \n'
+                    outstr += f'<a-animation attribute="rotation" from="0 0 0" to="0 {-90*self.unit(self.d["41"])*self.unit(self.d["42"])} 0" begin="click" repeat="1" direction="alternate"></a-animation>'
+                    #moving part 1
+                    outstr += f'<a-box id="{self.d["2"]}-{self.d["num"]}-moving-part-1" \n'
+                    outstr += f'position="{self.d["41"]/4} {(self.d["43"]-0.001*self.unit(self.d["43"]))/2} {-0.025*self.unit(self.d["42"])}" \n'
+                    outstr += f'scale="{(fabs(self.d["41"]))/2-0.002} {self.d["43"]-0.001*self.unit(self.d["43"])} 0.05" \n'
+                    outstr += f'material="src: #image-{self.d["8"]}; color: {self.d["color"]}'
+                    outstr += is_repeat(self.d["repeat"], (fabs(self.d["41"]))/2-0.002, self.d["43"]-0.001*self.unit(self.d["43"]))
+                    outstr += '"></a-box>\n'
+                    outstr += '</a-entity>\n'
+                    #animated hinge 2
+                    outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-hinge-2" '
+                    outstr += f'position="{self.d["41"]} 0 0"> \n'
+                    outstr += f'<a-animation attribute="rotation" from="0 0 0" to="0 {90*self.unit(self.d["41"])*self.unit(self.d["42"])} 0" begin="click" repeat="1" direction="alternate"></a-animation>'
+                    #moving part 2
+                    outstr += f'<a-box id="{self.d["2"]}-{self.d["num"]}-moving-part-2" \n'
+                    outstr += f'position="{-self.d["41"]/4} {(self.d["43"]-0.001*self.unit(self.d["43"]))/2} {-0.025*self.unit(self.d["42"])}" \n'
+                    outstr += f'scale="{(fabs(self.d["41"]))/2-0.002} {self.d["43"]-0.001*self.unit(self.d["43"])} 0.05" \n'
+                    outstr += f'material="src: #image-{self.d["8"]}; color: {self.d["color"]}'
+                    outstr += is_repeat(self.d["repeat"], (fabs(self.d["41"]))/2-0.002, self.d["43"]-0.001*self.unit(self.d["43"]))
+                    outstr += '"></a-box>\n'
+                    outstr += '</a-entity>\n'
+                    #end entity
+                    outstr += '</a-entity>hinged double\n'
+                    return outstr
+                else:#single
+                    #animated hinge
+                    outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-hinge"> \n'
+                    outstr += f'<a-animation attribute="rotation" from="0 0 0" to="0 {-90*self.unit(self.d["41"])*self.unit(self.d["42"])} 0" begin="click" repeat="1" direction="alternate"></a-animation>'
+                    #moving part
+                    outstr += f'<a-box id="{self.d["2"]}-{self.d["num"]}-moving-part" \n'
+                    outstr += f'position="{self.d["41"]/2} {(self.d["43"]-0.001*self.unit(self.d["43"]))/2} {-0.025*self.unit(self.d["42"])}" \n'
+                    outstr += f'scale="{fabs(self.d["41"])-0.002} {self.d["43"]-0.001*self.unit(self.d["43"])} 0.05" \n'
+                    outstr += f'material="src: #image-{self.d["8"]}; color: {self.d["color"]}'
+                    outstr += is_repeat(self.d["repeat"], fabs(self.d["41"])-0.002, self.d["43"]-0.001*self.unit(self.d["43"]))
+                    outstr += '"></a-box>\n'
+                    outstr += '</a-entity>\n'
+                    #end entity
+                    outstr += '</a-entity>\n'
+                    return outstr
 
     def unit(self, nounit):
         unit = fabs(nounit)/nounit
