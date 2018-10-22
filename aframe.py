@@ -1131,6 +1131,30 @@ class AOpening(object):#face it, this could be a APartition subclass
         else:
             if eval(self.d["sliding"]):
                 if eval(self.d["double"]):
+                    #animated slide 1
+                    outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-slide-1"> \n'
+                    outstr += f'<a-animation attribute="position" from="0 0 0" to="{-(self.d["41"])/2} 0 0" begin="click" repeat="1" direction="alternate"></a-animation>'
+                    #moving part 1
+                    outstr += f'<a-box id="{self.d["2"]}-{self.d["num"]}-moving-part-1" \n'
+                    outstr += f'position="{self.d["41"]/4} {(self.d["43"]-0.001*self.unit(self.d["43"]))/2} {-self.d["42"]/2}" \n'
+                    outstr += f'scale="{(fabs(self.d["41"]))/2-0.002} {self.d["43"]-0.001*self.unit(self.d["43"])} 0.05" \n'
+                    outstr += f'material="src: #image-{self.d["8"]}; color: {self.d["color"]}'
+                    outstr += is_repeat(self.d["repeat"], (fabs(self.d["41"]))/2-0.002, self.d["43"]-0.001*self.unit(self.d["43"]))
+                    outstr += '"></a-box>\n'
+                    outstr += '</a-entity>\n'
+                    #animated slide 2
+                    outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-slide-2" \n'
+                    outstr += f'position="{self.d["41"]} 0 0"> \n'
+                    outstr += f'<a-animation attribute="position" from="{self.d["41"]} 0 0" to="{(self.d["41"])*3/2} 0 0" begin="click" repeat="1" direction="alternate"></a-animation>'
+                    #moving part 2
+                    outstr += f'<a-box id="{self.d["2"]}-{self.d["num"]}-moving-part-2" \n'
+                    outstr += f'position="{-self.d["41"]/4} {(self.d["43"]-0.001*self.unit(self.d["43"]))/2} {-self.d["42"]/2}" \n'
+                    outstr += f'scale="{(fabs(self.d["41"]))/2-0.002} {self.d["43"]-0.001*self.unit(self.d["43"])} 0.05" \n'
+                    outstr += f'material="src: #image-{self.d["8"]}; color: {self.d["color"]}'
+                    outstr += is_repeat(self.d["repeat"], (fabs(self.d["41"]))/2-0.002, self.d["43"]-0.001*self.unit(self.d["43"]))
+                    outstr += '"></a-box>\n'
+                    outstr += '</a-entity>\n'
+                    #end entity
                     outstr += '</a-entity>\n'
                     return outstr
                 else:#single
@@ -1145,6 +1169,7 @@ class AOpening(object):#face it, this could be a APartition subclass
                     outstr += is_repeat(self.d["repeat"], fabs(self.d["41"])-0.002, self.d["43"]-0.001*self.unit(self.d["43"]))
                     outstr += '"></a-box>\n'
                     outstr += '</a-entity>\n'
+                    #end entity
                     outstr += '</a-entity>\n'
                     return outstr
             else:#hinged
