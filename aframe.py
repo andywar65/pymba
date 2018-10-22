@@ -1126,15 +1126,26 @@ class AOpening(object):#face it, this could be a APartition subclass
         outstr += '</a-box>\n'
 
         if self.d["type"] == 'ghost':
-            outstr += '</a-entity>ghost\n'
+            outstr += '</a-entity>\n'
             return outstr
         else:
             if eval(self.d["sliding"]):
                 if eval(self.d["double"]):
-                    outstr += '</a-entity>sliding double\n'
+                    outstr += '</a-entity>\n'
                     return outstr
                 else:#single
-                    outstr += '</a-entity>sliding single\n'
+                    #animated slide
+                    outstr += f'<a-entity id="{self.d["2"]}-{self.d["num"]}-slide"> \n'
+                    outstr += f'<a-animation attribute="position" from="0 0 0" to="{-self.d["41"]} 0 0" begin="click" repeat="1" direction="alternate"></a-animation>'
+                    #moving part
+                    outstr += f'<a-box id="{self.d["2"]}-{self.d["num"]}-moving-part" \n'
+                    outstr += f'position="{self.d["41"]/2} {(self.d["43"]-0.001*self.unit(self.d["43"]))/2} {-self.d["42"]/2}" \n'
+                    outstr += f'scale="{fabs(self.d["41"])-0.002} {self.d["43"]-0.001*self.unit(self.d["43"])} 0.05" \n'
+                    outstr += f'material="src: #image-{self.d["8"]}; color: {self.d["color"]}'
+                    outstr += is_repeat(self.d["repeat"], fabs(self.d["41"])-0.002, self.d["43"]-0.001*self.unit(self.d["43"]))
+                    outstr += '"></a-box>\n'
+                    outstr += '</a-entity>\n'
+                    outstr += '</a-entity>\n'
                     return outstr
             else:#hinged
                 if eval(self.d["double"]):
@@ -1162,7 +1173,7 @@ class AOpening(object):#face it, this could be a APartition subclass
                     outstr += '"></a-box>\n'
                     outstr += '</a-entity>\n'
                     #end entity
-                    outstr += '</a-entity>hinged double\n'
+                    outstr += '</a-entity>\n'
                     return outstr
                 else:#single
                     #animated hinge
