@@ -969,24 +969,26 @@ class APartition(object):
 
         try:
             finishing = self.finishings.get(title = self.d[self.d['side']])
+            wall_height = fabs(self.d['height'])
 
             tiling_height = fabs(float(finishing.tiling_height))/100*self.d['43']/fabs(self.d['43'])
             skirting_height = fabs(float(finishing.skirting_height))/100*self.d['43']/fabs(self.d['43'])
-            if fabs(door_height) > fabs(self.d['height']):
-                door_height = self.d['height']
-                tiling_height = self.d['height']
-                skirting_height = self.d['height']
-            else:
-                if fabs(skirting_height) < fabs(door_height):
-                    skirting_height = door_height
-                if fabs(skirting_height) > self.d['height']:
-                    skirting_height = self.d['height']
-                if fabs(tiling_height) < fabs(skirting_height):
-                    tiling_height = skirting_height
-                if fabs(tiling_height) > self.d['height']:
-                    tiling_height = self.d['height']
 
-            wall_height = self.d['height'] - tiling_height
+            if door_height > wall_height:
+                door_height = wall_height
+                tiling_height = wall_height
+                skirting_height = wall_height
+            else:
+                if skirting_height < door_height:
+                    skirting_height = door_height
+                if skirting_height > wall_height:
+                    skirting_height = wall_height
+                if tiling_height < skirting_height:
+                    tiling_height = skirting_height
+                if tiling_height > wall_height:
+                    tiling_height = wall_height
+
+            wall_height = wall_height - tiling_height
             tiling_height = tiling_height - skirting_height
             skirting_height = skirting_height - door_height
 
@@ -1001,13 +1003,17 @@ class APartition(object):
             else:
                 wall_color = self.d['color']
 
-            outstr = f'<a-plane id="{self.d["2"]}-{self.d["num"]}-{self.d["sub_side"]}" \n'
-            outstr += f'position="0 {wall_height/2+tiling_height+skirting_height} 0" \n'
-            outstr += f'width="{self.d["width"]}" height="{wall_height}" \n'
-            outstr += f'material="src: #image-{wall_image}; color: {wall_color}'
-            outstr += is_repeat(wall_repeat, self.d['width'], wall_height)
-            outstr += '">\n</a-plane> \n'
-            self.csv_f.write(f'{self.d["num"]},{self.d["layer"]},{self.d["2"]},{self.d["sub_side"]},Wall,{finishing.title},-,-,-,-,-,-,{self.d["width"]},{wall_height},-,-,- \n')
+            outstr = ''
+
+            if wall_height:
+                outstr += f'<a-plane id="{self.d["2"]}-{self.d["num"]}-{self.d["sub_side"]}" \n'
+                outstr += f'position="0 {wall_height/2+tiling_height+skirting_height} 0" \n'
+                outstr += f'width="{self.d["width"]}" height="{wall_height}" \n'
+                outstr += f'material="src: #image-{wall_image}; color: {wall_color}'
+                outstr += is_repeat(wall_repeat, self.d['width'], wall_height)
+                outstr += '">\n</a-plane> \n'
+                self.csv_f.write(f'{self.d["num"]},{self.d["layer"]},{self.d["2"]},{self.d["sub_side"]},Wall,{finishing.title},-,-,-,-,-,-,{self.d["width"]},{wall_height},-,-,- \n')
+
             if tiling_height:
                 outstr += f'<a-plane id="{self.d["2"]}-{self.d["num"]}-{self.d["sub_side"]}-tiling" \n'
                 outstr += f'position="0 {tiling_height/2+skirting_height} 0" \n'
@@ -1016,6 +1022,7 @@ class APartition(object):
                 outstr += is_repeat(finishing.tiling_pattern, self.d['width'], tiling_height)
                 outstr += '">\n</a-plane> \n'
                 self.csv_f.write(f'{self.d["num"]},{self.d["layer"]},{self.d["2"]},{self.d["sub_side"]},Tiling,{finishing.title},-,-,-,-,-,-,{self.d["width"]},{tiling_height},-,-,- \n')
+
             if skirting_height:
                 outstr += f'<a-plane id="{self.d["2"]}-{self.d["num"]}-{self.d["sub_side"]}-skirting" \n'
                 outstr += f'position="0 {skirting_height/2} 0" \n'
@@ -1024,8 +1031,9 @@ class APartition(object):
                 outstr += is_repeat(finishing.skirting_pattern, self.d['width'], skirting_height)
                 outstr += '">\n</a-plane> \n'
                 self.csv_f.write(f'{self.d["num"]},{self.d["layer"]},{self.d["2"]},{self.d["sub_side"]},Skirting,{finishing.title},-,-,-,-,-,-,{self.d["width"]},{skirting_height},-,-,- \n')
+
         except:
-            outstr = f'<a-plane id="{self.d["2"]}-{self.d["num"]}-{self.d["sub_side"]}" \n'
+            outstr = f'<a-plane id="except-{self.d["2"]}-{self.d["num"]}-{self.d["sub_side"]}" \n'
             outstr += f'position="0 {(self.d["height"]-door_height)/2} 0" \n'
             outstr += f'width="{self.d["width"]}" height="{self.d["height"]-door_height}" \n'
             outstr += f'material="src: #image-{self.d["8"]}; color: {self.d["color"]}'
