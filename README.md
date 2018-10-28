@@ -14,7 +14,7 @@ Lots of programs deal with DXF, but the goal here is to have blocks with attribu
 
 ### Install Wagtail app
 
-The app can be cloned or downloaded from [Github](https://github.com/andywar65/pymba). Using a shell get into the project folder and type  `git clone https://github.com/andywar65/pymba`. Add `pymba` to the INSTALLED_APPS in your settings file. Migrate. The app's templates look for a `base.html` file, so be sure to have one.
+The app can be cloned or downloaded from [Github](https://github.com/andywar65/pymba). Using a shell get into the project folder and type  `git clone https://github.com/andywar65/pymba`. Add `pymba` to the INSTALLED_APPS in your settings file. Migrate and Collectstatic. The app's templates look for a `base.html` file, so be sure to have one.
 
 ### DXF constraints
 
